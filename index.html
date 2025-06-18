@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskPilot</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="top-block">
+    <div id="next-event">▶ 次の予定まで 30分</div>
+    <div class="event-detail hidden" id="event-detail">
+      技研さんミーティング<br>
+      16:30-17:00<br>
+      説明なし<br>
+      <a href="#">URL</a>
+    </div>
+    <div class="task-card suggested">
+      <div class="task-time">8分</div>
+      <div>
+        <div class="task-title">プレゼン資料作り</div>
+        <div class="task-level">レベル3</div>
+      </div>
+    </div>
+    <div class="task-card suggested">
+      <div class="task-time">15分</div>
+      <div>
+        <div class="task-title">CG課題</div>
+        <div class="task-level">レベル4</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="middle-block">
+    <div class="task-list-title">タスク一覧</div>
+    <div class="task-card">
+      <div class="task-time">15分</div>
+      <div>
+        <div class="task-title">メール文章</div>
+        <div class="task-level">レベル2</div>
+      </div>
+    </div>
+    <div class="task-card">
+      <div class="task-time">8分</div>
+      <div>
+        <div class="task-title">プレゼン資料作り</div>
+        <div class="task-level">レベル3</div>
+      </div>
+    </div>
+    <div class="task-card">
+      <div class="task-time">15分</div>
+      <div>
+        <div class="task-title">CG課題</div>
+        <div class="task-level">レベル4</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-block">
+    <input id="task-input" type="text" placeholder="タスクを入力">
+    <button id="add-task-btn">
+      <span class="material-icons" id="add-task-icon">send</span>
+    </button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
