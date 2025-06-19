@@ -112,31 +112,44 @@ function listUpcomingEvents() {
     timeMin: new Date().toISOString(),
     showDeleted: false,
     singleEvents: true,
-    maxResults: 5,
+    maxResults: 1,
     orderBy: 'startTime'
   };
 
-  // デバッグ用: API呼び出しパラメータを出力
   console.log("📤 API呼び出しパラメータ:", calendarParams);
 
   gapi.client.calendar.events.list(calendarParams).then(response => {
     const events = response.result.items;
     console.log("📄 カレンダーイベント取得結果:", events);
-    const eventsList = document.getElementById('events');
-    eventsList.innerHTML = '';
+    const detail = document.getElementById('event-detail');
+    detail.innerHTML = '';
 
     if (events.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = '予定は見つかりませんでした。';
-      eventsList.appendChild(li);
-    } else {
-      events.forEach(event => {
-        const when = event.start.dateTime || event.start.date;
-        const li = document.createElement('li');
-        li.textContent = `${event.summary} (${when})`;
-        eventsList.appendChild(li);
-      });
+      detail.innerHTML = '予定は見つかりませんでした。';
+      detail.classList.remove("hidden");
+      return;
     }
+
+    const event = events[0];
+    const title = event.summary || "タイトルなし";
+    const description = event.description || "説明なし";
+    const start = new Date(event.start.dateTime || event.start.date);
+    const end = new Date(event.end.dateTime || event.end.date);
+    const durationMin = Math.round((end - start) / (1000 * 60));
+    const startTimeStr = `${start.getHours()}:${String(start.getMinutes()).padStart(2, '0')}`;
+    const endTimeStr = `${end.getHours()}:${String(end.getMinutes()).padStart(2, '0')}`;
+    const htmlLink = event.htmlLink || "#";
+
+    detail.innerHTML = `
+      ${title}<br>
+      ${startTimeStr} - ${endTimeStr}（${durationMin}分間）<br>
+      ${description}<br>
+      <a href="${htmlLink}" target="_blank">URL</a>
+    `;
+    detail.classList.remove("hidden");
+
+    const nextEvent = document.getElementById("next-event");
+    nextEvent.textContent = nextEvent.textContent.replace("▼", "▶");
   }).catch(error => {
     console.error("❌ APIエラー内容:", error);
   });
