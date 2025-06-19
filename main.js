@@ -26,6 +26,10 @@ const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+provider.setCustomParameters({
+  prompt: 'consent',
+  access_type: 'offline'
+});
 
 // 🔐 ユーザーがログインボタンをクリックしたとき
 const loginBtn = document.getElementById("login-btn");
