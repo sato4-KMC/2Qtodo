@@ -32,7 +32,12 @@ const loginBtn = document.getElementById("login-btn");
 loginBtn.addEventListener("click", async () => {
   try {
     console.log("🟢 ログイン開始");
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    const cred = GoogleAuthProvider.credentialFromResult(result);
+    const accessToken = cred.accessToken;
+    if (accessToken) {
+      sessionStorage.setItem("google_access_token", accessToken);
+    }
     console.log("✅ ログイン成功");
   } catch (e) {
     alert("ログインに失敗しました");
@@ -44,6 +49,7 @@ loginBtn.addEventListener("click", async () => {
 const logoutBtn = document.getElementById("logout-btn");
 logoutBtn.addEventListener("click", async () => {
   console.log("🔴 ログアウトします");
+  sessionStorage.removeItem("google_access_token");
   await signOut(auth);
 });
 
@@ -73,8 +79,11 @@ calendarBtn.addEventListener("click", async () => {
       return;
     }
 
-    const tokenResult = await user.getIdTokenResult();
-    const accessToken = tokenResult.token;
+    const accessToken = sessionStorage.getItem("google_access_token");
+    if (!accessToken) {
+      alert("アクセストークンがありません。再ログインしてください。");
+      return;
+    }
 
     await gapi.load("client", async () => {
       await gapi.client.init({
