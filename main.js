@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
 
+// Firebase 初期化
 const firebaseConfig = {
   apiKey: "AIzaSyDk9Iq4ZGZ3FhVwgpcGju1LlIRBNmqyZos",
   authDomain: "qtodo-d8ec8.firebaseapp.com",
@@ -15,65 +16,78 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// Google Calendar API constants
+// Google Calendar API 定数定義
 const CLIENT_ID = '693462078129-6udiv93h2ip1gjkfi1n78vd20nppfvq7.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyDwWeP04_wH7cW7JbT1OATv5C_JdhG7j74';
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
-// Removed GIS OAuth 2.0 token client functions and handleAuthClick, handleClientLoad, initClient, handleCredentialResponse as per instructions
-
-// Firebase Auth setup and login state monitoring
+// Firebase Auth setup
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 
+// 🔐 ユーザーがログインボタンをクリックしたとき
 const loginBtn = document.getElementById("login-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const calendarBtn = document.getElementById("calendar-btn");
-
 loginBtn.addEventListener("click", async () => {
   try {
+    console.log("🟢 ログイン開始");
     await signInWithPopup(auth, provider);
+    console.log("✅ ログイン成功");
   } catch (e) {
     alert("ログインに失敗しました");
-    console.error(e);
+    console.error("❌ ログインエラー:", e);
   }
 });
 
+// 🔓 ログアウト処理
+const logoutBtn = document.getElementById("logout-btn");
 logoutBtn.addEventListener("click", async () => {
+  console.log("🔴 ログアウトします");
   await signOut(auth);
 });
 
+// 👤 認証状態の変化を監視
+const calendarBtn = document.getElementById("calendar-btn");
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    console.log("✅ ログイン状態を検出:", user.email);
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     calendarBtn.classList.remove("hidden");
   } else {
+    console.log("👋 ログアウト状態です");
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
     calendarBtn.classList.add("hidden");
   }
 });
 
+// 📅 Googleカレンダー予定を取得
 calendarBtn.addEventListener("click", async () => {
   try {
-    const result = await signInWithPopup(auth, provider);
-    const cred = GoogleAuthProvider.credentialFromResult(result);
-    const token = cred.accessToken;
+    console.log("📥 予定の取得を開始");
+    const user = auth.currentUser;
+    if (!user) {
+      alert("ログインしていません");
+      return;
+    }
+
+    const tokenResult = await user.getIdTokenResult();
+    const accessToken = tokenResult.token;
 
     await gapi.load("client", async () => {
       await gapi.client.init({
         apiKey: API_KEY,
         discoveryDocs: [DISCOVERY_DOC],
       });
-      gapi.client.setToken({ access_token: token });
+      gapi.client.setToken({ access_token: accessToken });
+      console.log("📡 APIにアクセスします");
       listUpcomingEvents();
     });
   } catch (e) {
     alert("予定取得に失敗しました");
-    console.error(e);
+    console.error("❌ 予定取得エラー:", e);
   }
 });
 
@@ -88,7 +102,7 @@ function listUpcomingEvents() {
     orderBy: 'startTime'
   }).then(response => {
     const events = response.result.items;
-    console.log("Fetched events:", events);
+    console.log("📄 カレンダーイベント取得結果:", events);
     const eventsList = document.getElementById('events');
     eventsList.innerHTML = '';
 
@@ -107,6 +121,7 @@ function listUpcomingEvents() {
   });
 }
 
+// タスク処理・UI関連関数
 const dummyTasks = [
   {
     id: "1",
