@@ -4,6 +4,8 @@ const API_KEY = 'AIzaSyDwWeP04_wH7cW7JbT1OATv5C_JdhG7j74';
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
+let tokenClient; // GIS OAuth 2.0 token client
+
 // Google Calendar API functions
 function handleClientLoad() {
   // GIS uses its own initialization, so no need to load gapi client:auth2 here
@@ -11,11 +13,25 @@ function handleClientLoad() {
 }
 
 function initClient() {
-  google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    callback: handleCredentialResponse,
+  // 1) Load gapi client
+  gapi.load('client', async () => {
+    await gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+
+    // 2) Prepare GIS OAuth2 token client
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: (tokenResponse) => {
+        // 3) Save access token inside gapi
+        gapi.client.setToken({ access_token: tokenResponse.access_token });
+        // 4) Fetch calendar events
+        listUpcomingEvents();
+      },
+    });
   });
-  google.accounts.id.prompt(); // 自動表示。手動ログインならこの行を削除して別ボタンで呼ぶ
 }
 
 function handleCredentialResponse(response) {
@@ -36,29 +52,12 @@ function handleCredentialResponse(response) {
 }
 
 function handleAuthClick() {
-  google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    callback: async (response) => {
-      const idToken = response.credential;
-
-      // Load the Google API client
-      await gapi.load('client', async () => {
-        await gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [DISCOVERY_DOC],
-        });
-
-        // Set the access token manually using the ID token from GIS
-        gapi.client.setToken({ id_token: idToken });
-
-        // Now call the calendar API
-        listUpcomingEvents();
-      });
-    },
-  });
-
-  // Trigger the sign-in prompt
-  google.accounts.id.prompt();
+  if (!tokenClient) {
+    console.error('Token client not initialized yet.');
+    return;
+  }
+  // Opens a GIS popup once; multiple simultaneous requests are prevented
+  tokenClient.requestAccessToken({ prompt: 'consent' });
 }
 
 function listUpcomingEvents() {
