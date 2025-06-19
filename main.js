@@ -52,8 +52,17 @@ onAuthStateChanged(auth, async (user) => {
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     calendarBtn.classList.remove("hidden");
+  } else {
+    loginBtn.classList.remove("hidden");
+    logoutBtn.classList.add("hidden");
+    calendarBtn.classList.add("hidden");
+  }
+});
 
-    const cred = GoogleAuthProvider.credentialFromResult(await signInWithPopup(auth, provider));
+calendarBtn.addEventListener("click", async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const cred = GoogleAuthProvider.credentialFromResult(result);
     const token = cred.accessToken;
 
     await gapi.load("client", async () => {
@@ -64,14 +73,11 @@ onAuthStateChanged(auth, async (user) => {
       gapi.client.setToken({ access_token: token });
       listUpcomingEvents();
     });
-  } else {
-    loginBtn.classList.remove("hidden");
-    logoutBtn.classList.add("hidden");
-    calendarBtn.classList.add("hidden");
+  } catch (e) {
+    alert("予定取得に失敗しました");
+    console.error(e);
   }
 });
-
-calendarBtn.addEventListener("click", listUpcomingEvents);
 
 // Google Calendar API function
 function listUpcomingEvents() {
