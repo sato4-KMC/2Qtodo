@@ -70,34 +70,9 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // 📅 Googleカレンダー予定を取得
-calendarBtn.addEventListener("click", async () => {
-  try {
-    console.log("📥 予定の取得を開始");
-    const user = auth.currentUser;
-    if (!user) {
-      alert("ログインしていません");
-      return;
-    }
-
-    const accessToken = sessionStorage.getItem("google_access_token");
-    if (!accessToken) {
-      alert("アクセストークンがありません。再ログインしてください。");
-      return;
-    }
-
-    await gapi.load("client", async () => {
-      await gapi.client.init({
-        apiKey: API_KEY,
-        discoveryDocs: [DISCOVERY_DOC],
-      });
-      gapi.client.setToken({ access_token: accessToken });
-      console.log("📡 APIにアクセスします");
-      listUpcomingEvents();
-    });
-  } catch (e) {
-    alert("予定取得に失敗しました");
-    console.error("❌ 予定取得エラー:", e);
-  }
+calendarBtn.addEventListener("click", () => {
+  console.log("📥 予定の取得を開始");
+  safeListEvents();
 });
 
 // Google Calendar API function
@@ -127,6 +102,47 @@ function listUpcomingEvents() {
         eventsList.appendChild(li);
       });
     }
+  });
+}
+
+async function safeListEvents() {
+  try {
+    await tryListEvents();
+  } catch (err) {
+    console.warn("⚠️ トークンが無効かもしれません。再ログインを促します。", err);
+    alert("トークンの有効期限が切れているため、再ログインが必要です。");
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const cred = GoogleAuthProvider.credentialFromResult(result);
+      const newAccessToken = cred.accessToken;
+      if (newAccessToken) {
+        sessionStorage.setItem("google_access_token", newAccessToken);
+        await tryListEvents(); // 再実行
+      } else {
+        throw new Error("アクセストークンが取得できませんでした。");
+      }
+    } catch (e) {
+      alert("再ログインに失敗しました。");
+      console.error("❌ 再ログイン失敗:", e);
+    }
+  }
+}
+
+async function tryListEvents() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("未ログイン状態です");
+
+  const accessToken = sessionStorage.getItem("google_access_token");
+  if (!accessToken) throw new Error("トークンが存在しません");
+
+  await gapi.load("client", async () => {
+    await gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+    gapi.client.setToken({ access_token: accessToken });
+    console.log("📡 APIにアクセスします（再試行）");
+    listUpcomingEvents();
   });
 }
 
