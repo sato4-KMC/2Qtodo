@@ -107,9 +107,14 @@ calendarBtn.addEventListener("click", () => {
 
 // Google Calendar API function
 function listUpcomingEvents() {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
   const calendarParams = {
     calendarId: 'primary',
-    timeMin: new Date().toISOString(),
+    timeMin: todayStart.toISOString(),
+    timeMax: todayEnd.toISOString(),
     showDeleted: false,
     singleEvents: true,
     maxResults: 1,
@@ -148,8 +153,9 @@ function listUpcomingEvents() {
     `;
     detail.classList.remove("hidden");
 
+    const timeDiffMin = Math.round((start - new Date()) / (1000 * 60));
     const nextEvent = document.getElementById("next-event");
-    nextEvent.textContent = nextEvent.textContent.replace("▼", "▶");
+    nextEvent.textContent = `▶ 次の予定まで ${timeDiffMin}分`;
   }).catch(error => {
     console.error("❌ APIエラー内容:", error);
   });
