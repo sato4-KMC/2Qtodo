@@ -113,6 +113,8 @@ function listUpcomingEvents() {
         eventsList.appendChild(li);
       });
     }
+  }).catch(error => {
+    console.error("❌ APIエラー内容:", error);
   });
 }
 
