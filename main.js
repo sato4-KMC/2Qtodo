@@ -151,7 +151,9 @@ async function tryListEvents() {
   await gapi.load("client", async () => {
     await gapi.client.init({
       apiKey: API_KEY,
+      clientId: CLIENT_ID,
       discoveryDocs: [DISCOVERY_DOC],
+      scope: SCOPES
     });
     console.log("🔍 取得したアクセストークン:", accessToken);
     gapi.client.setToken({ access_token: accessToken });
