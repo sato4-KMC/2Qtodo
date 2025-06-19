@@ -6,9 +6,16 @@
   <title>TaskPilot</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
+  <div id="modal-bg" class="hidden"></div>
   <div class="top-block">
+    <h1>Google Calendar 予定取得</h1>
+  <button onclick="handleAuthClick()">Googleログイン</button>
+  <button onclick="listUpcomingEvents()">予定を取得</button>
+  <ul id="events"></ul>
+
     <div id="next-event">▶ 次の予定まで 30分</div>
     <div class="event-detail hidden" id="event-detail">
       技研さんミーティング<br>
@@ -58,11 +65,36 @@
   </div>
 
   <div class="bottom-block">
-    <input id="task-input" type="text" placeholder="タスクを入力">
-    <button id="add-task-btn">
-      <span class="material-icons" id="add-task-icon">send</span>
-    </button>
+    <div id="task-input-view">
+      <textarea id="bottom-block-input" placeholder="タスクを追加" rows="1" oninput="resizeTextarea(this)"></textarea>
+      <div class="bottom-block-column">
+        <button id="expand-input-btn" disabled="false" onclick="alert('test')">
+          <span class="material-icons" id="expand-input-icon">open_in_full</span>
+        </button>
+        <button id="next-task-btn" onclick="setTask()">
+          <span class="material-icons" id="next-task-icon">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+    <div id="task-setting-view">
+      <div class="task-setting-view-time">
+        <label class="bottom-block-column-label">必要時間</label>
+        <h2 id="duration-label">15分</h2>
+        <input type="range" id="duration-range" min="1" max="60" value="15" oninput="updateDurationLabel()">
+      </div>
+      <div class="task-setting-view-priority">
+        <label class="bottom-block-column-label">優先度レベル</label>
+        <h2 id="level-label">レベル 3</h2>
+        <input type="range" id="level-range" min="1" max="5" value="3" oninput="updateLevelLabel()">
+      </div>
+      <button id="add-task-btn" onclick="addTask()">
+        <span class="material-icons" id="add-task-icon">send</span>
+         追加</button>
+    </div>
   </div>
 
   <script src="main.js"></script>
-</body>
+  <script>
+    
+  </script>
+</body></html>

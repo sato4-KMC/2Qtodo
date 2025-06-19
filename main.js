@@ -1,4 +1,56 @@
+// Google Calendar API constants
+const CLIENT_ID = '693462078129-6udiv93h2ip1gjkfi1n78vd20nppfvq7.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyDwWeP04_wH7cW7JbT1OATv5C_JdhG7j74';
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
+// Google Calendar API functions
+function handleClientLoad() {
+  gapi.load('client:auth2', initClient);
+}
+
+function initClient() {
+  gapi.client.init({
+    apiKey: API_KEY,
+    clientId: CLIENT_ID,
+    discoveryDocs: [DISCOVERY_DOC],
+    scope: SCOPES
+  });
+}
+
+function handleAuthClick() {
+  gapi.auth2.getAuthInstance().signIn();
+}
+
+function listUpcomingEvents() {
+  gapi.client.calendar.events.list({
+    calendarId: 'primary',
+    timeMin: new Date().toISOString(),
+    showDeleted: false,
+    singleEvents: true,
+    maxResults: 5,
+    orderBy: 'startTime'
+  }).then(response => {
+    const events = response.result.items;
+    const eventsList = document.getElementById('events');
+    eventsList.innerHTML = '';
+
+    if (events.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = '予定は見つかりませんでした。';
+      eventsList.appendChild(li);
+    } else {
+      events.forEach(event => {
+        const when = event.start.dateTime || event.start.date;
+        const li = document.createElement('li');
+        li.textContent = `${event.summary} (${when})`;
+        eventsList.appendChild(li);
+      });
+    }
+  });
+}
+
+window.onload = handleClientLoad;
 const dummyTasks = [
   {
     id: "1",
@@ -26,19 +78,19 @@ const dummyTasks = [
   },
 ];
 
-function renderTasks(tasks, containerId) {
-  const container = document.getElementById(containerId);
+function renderTasks() {
+  const container = document.querySelector('.middle-block');
   if (!container) return;
 
-  container.innerHTML = "";
-  tasks.forEach((task) => {
+  container.innerHTML = "<div class='task-list-title'>タスク一覧</div>";
+  dummyTasks.forEach((task) => {
     const card = document.createElement("div");
     card.className = "task-card";
     card.innerHTML = `
-      <div>${task.title}</div>
-      <div class="task-meta">
-        <span>${task.durationMin}分</span>
-        <span>レベル${task.level}</span>
+      <div class="task-time">${task.durationMin}分</div>
+      <div>
+        <div class="task-title">${task.title}</div>
+        <div class="task-level">レベル${task.level}</div>
       </div>
     `;
     container.appendChild(card);
@@ -46,8 +98,7 @@ function renderTasks(tasks, containerId) {
 }
 
 // 初期表示
-renderTasks(dummyTasks.slice(0, 2), "suggested-tasks");
-renderTasks(dummyTasks, "task-list");
+renderTasks();
 
 // #next-eventクリックで予定詳細の表示/非表示を切り替え
 const nextEvent = document.getElementById("next-event");
@@ -62,4 +113,106 @@ if (nextEvent && eventDetail) {
       nextEvent.textContent = nextEvent.textContent.replace("▼", "▶");
     }
   });
+}
+
+function resizeTextarea(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+  const bottomBlock = document.querySelector('.bottom-block');
+  if (textarea.scrollHeight > "80vh") {
+    bottomBlock.style.height = "85vh";
+  } else {
+    bottomBlock.style.height = textarea.scrollHeight + 'px';
+  }
+  
+  const thirtyVh = window.innerHeight * 0.3;
+  const ninetyVh = window.innerHeight * 0.9 - "48px";
+  
+  if (textarea.scrollHeight > ninetyVh) {
+    // 90vhを超えた場合：expandボタンを非表示、スクロール有効
+    document.getElementById("expand-input-btn").style.opacity = "0";
+    document.getElementById("expand-input-btn").disabled = true;
+    textarea.style.overflowY = "auto";
+    textarea.scrollTop = "80vh"; // 最新の文字を一番下に表示
+  } else if (textarea.scrollHeight > thirtyVh) {
+    document.getElementById("expand-input-btn").style.opacity = "1";
+    document.getElementById("expand-input-btn").disabled = false;
+    textarea.style.overflowY = "hidden";
+  } else {
+    document.getElementById("expand-input-btn").style.opacity = "0";
+    document.getElementById("expand-input-btn").disabled = true;
+    textarea.style.overflowY = "hidden";
+  }
+}
+
+// task-input focus時にモーダル表示、modalBgクリックで非表示
+const taskInput = document.getElementById("bottom-block-input");
+const modalBg = document.getElementById("modal-bg");
+const bottomBlock = document.querySelector('.bottom-block');
+if (taskInput && modalBg) {
+  taskInput.addEventListener("focus", () => {
+    resizeTextarea(taskInput);
+    modalBg.style.display = "block";
+  });
+
+  modalBg.addEventListener("click", () => {
+    taskInput.blur();
+    modalBg.style.display = "none";
+    taskInput.style.height = '100%';
+    bottomBlock.style.height = '100px';
+  });
+}
+
+function setTask() {
+  const taskInput = document.getElementById("bottom-block-input");
+  const taskTitle = taskInput.value;
+  if (taskTitle.trim() == "") {
+    alert("❌ タスクを入力してください");
+    return;
+  }
+  toggleSettingView(true);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderTasks();
+});
+
+function addTask() {
+  const taskInput = document.getElementById("bottom-block-input");
+  const taskTitle = taskInput.value;
+  const newTask = {
+    id: Date.now().toString(),
+    title: taskTitle,
+    durationMin: document.getElementById('duration-range').value,
+    level: document.getElementById('level-range').value,
+    createdAt: new Date().toISOString(),
+    completed: false,
+  }
+  dummyTasks.push(newTask);
+  document.getElementById('task-input-view').style.display = 'flex';
+  document.getElementById('task-setting-view').style.display = 'none';
+  document.querySelector('.bottom-block').style.height = '100px';
+  document.getElementById('modal-bg').style.display = 'none';
+  taskInput.value = "";
+  renderTasks();
+}
+
+function toggleSettingView(showSettings) {
+  document.getElementById('task-input-view').style.display = showSettings ? 'none' : 'flex';
+  document.getElementById('task-setting-view').style.display = showSettings ? 'flex' : 'none';
+  if (showSettings) {
+    document.querySelector('.bottom-block').style.height = '300px';
+  } else {
+    document.querySelector('.bottom-block').style.height = '100px';
+  }
+}
+
+function updateDurationLabel() {
+  const value = document.getElementById('duration-range').value;
+  document.getElementById('duration-label').textContent = `${value}分`;
+}
+
+function updateLevelLabel() {
+  const value = document.getElementById('level-range').value;
+  document.getElementById('level-label').textContent = `レベル ${value}`;
 }
