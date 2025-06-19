@@ -155,7 +155,7 @@ function listUpcomingEvents() {
 
     const timeDiffMin = Math.round((start - new Date()) / (1000 * 60));
     const nextEvent = document.getElementById("next-event");
-    nextEvent.textContent = `▶ 次の予定まで ${timeDiffMin}分`;
+    nextEvent.textContent = `▼ 次の予定まで ${timeDiffMin}分`;
   }).catch(error => {
     console.error("❌ APIエラー内容:", error);
   });
