@@ -20,7 +20,19 @@ function initClient() {
 
 function handleCredentialResponse(response) {
   console.log("ID Token:", response.credential);
-  // ここでIDトークンを使った認証処理を追加できます
+
+  gapi.load('client', async () => {
+    await gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+
+    // Set the token
+    gapi.client.setToken({ id_token: response.credential });
+
+    // Fetch and display events
+    listUpcomingEvents();
+  });
 }
 
 function handleAuthClick() {
@@ -59,6 +71,7 @@ function listUpcomingEvents() {
     orderBy: 'startTime'
   }).then(response => {
     const events = response.result.items;
+    console.log("Fetched events:", events);
     const eventsList = document.getElementById('events');
     eventsList.innerHTML = '';
 
