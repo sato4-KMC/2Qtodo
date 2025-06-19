@@ -24,8 +24,29 @@ function handleCredentialResponse(response) {
 }
 
 function handleAuthClick() {
-  // gapi.auth2 is no longer used with GIS, so this function can be left empty or removed
-  // gapi.auth2.getAuthInstance().signIn({ prompt: 'select_account' });
+  google.accounts.id.initialize({
+    client_id: CLIENT_ID,
+    callback: async (response) => {
+      const idToken = response.credential;
+
+      // Load the Google API client
+      await gapi.load('client', async () => {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+
+        // Set the access token manually using the ID token from GIS
+        gapi.client.setToken({ id_token: idToken });
+
+        // Now call the calendar API
+        listUpcomingEvents();
+      });
+    },
+  });
+
+  // Trigger the sign-in prompt
+  google.accounts.id.prompt();
 }
 
 function listUpcomingEvents() {
