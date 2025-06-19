@@ -31,6 +31,10 @@ provider.setCustomParameters({
   access_type: 'offline'      // ✅ リフレッシュトークンを取得するために必要
 });
 
+// ファイル冒頭付近に追加
+let tokenClient;
+let accessToken = null;
+
 // 🔐 ユーザーがログインボタンをクリックしたとき
 const loginBtn = document.getElementById("login-btn");
 loginBtn.addEventListener("click", async () => {
@@ -38,11 +42,11 @@ loginBtn.addEventListener("click", async () => {
     console.log("🟢 ログイン開始");
     const result = await signInWithPopup(auth, provider);
     const cred = GoogleAuthProvider.credentialFromResult(result);
-    const accessToken = cred.accessToken;
-    if (accessToken) {
-      console.log("🔑 アクセストークン:", accessToken);
+    const accessTokenFirebase = cred.accessToken;
+    if (accessTokenFirebase) {
+      console.log("🔑 アクセストークン:", accessTokenFirebase);
       // 💡 セッション単位で保持するため、セキュリティを考慮して sessionStorage を使用
-      sessionStorage.setItem("google_access_token", accessToken);
+      sessionStorage.setItem("google_access_token", accessTokenFirebase);
     }
     console.log("✅ ログイン成功");
   } catch (e) {
@@ -74,6 +78,26 @@ onAuthStateChanged(auth, async (user) => {
     calendarBtn.classList.add("hidden");
   }
 });
+
+// 既存 onAuthStateChanged の後に追加
+window.onload = () => {
+  gapi.load('client', async () => {
+    await gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: [DISCOVERY_DOC]
+    });
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: (tokenResponse) => {
+        accessToken = tokenResponse.access_token;
+        console.log("🔑 GISアクセストークン:", accessToken);
+        tryListEvents(accessToken);  // GISで取得したトークンで予定取得
+      }
+    });
+  });
+};
 
 // 📅 Googleカレンダー予定を取得
 calendarBtn.addEventListener("click", () => {
@@ -118,46 +142,27 @@ function listUpcomingEvents() {
   });
 }
 
+// safeListEvents 関数を書き換え
 async function safeListEvents() {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("ログインしてください");
+    return;
+  }
+
   try {
-    await tryListEvents();
+    tokenClient.requestAccessToken({ prompt: 'consent' });
   } catch (err) {
-    console.warn("⚠️ トークンが無効かもしれません。再ログインを促します。", err);
-    alert("トークンの有効期限が切れているため、再ログインが必要です。");
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const cred = GoogleAuthProvider.credentialFromResult(result);
-      const newAccessToken = cred.accessToken;
-      if (newAccessToken) {
-        sessionStorage.setItem("google_access_token", newAccessToken);
-        await tryListEvents(); // 再実行
-      } else {
-        throw new Error("アクセストークンが取得できませんでした。");
-      }
-    } catch (e) {
-      alert("再ログインに失敗しました。");
-      console.error("❌ 再ログイン失敗:", e);
-    }
+    console.error("❌ GISトークン取得失敗:", err);
+    alert("カレンダーアクセスに失敗しました。");
   }
 }
 
-async function tryListEvents() {
-  const user = auth.currentUser;
-  if (!user) throw new Error("未ログイン状態です");
+// tryListEvents を accessToken 引数付きに変更
+async function tryListEvents(accessToken) {
+  if (!accessToken) throw new Error("アクセストークンがありません");
 
-  const accessToken = sessionStorage.getItem("google_access_token");
-  if (!accessToken) throw new Error("トークンが存在しません");
-
-  await gapi.load("client", async () => {
-    await gapi.client.init({
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      discoveryDocs: [DISCOVERY_DOC],
-      scope: SCOPES
-    });
-    console.log("🔍 取得したアクセストークン:", accessToken);
-    gapi.client.setToken({ access_token: accessToken });
-    console.log("📡 APIにアクセスします（再試行）");
-    listUpcomingEvents();
-  });
+  gapi.client.setToken({ access_token: accessToken });
+  console.log("📡 APIにアクセスします");
+  listUpcomingEvents();
 }
