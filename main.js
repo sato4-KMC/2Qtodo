@@ -81,14 +81,19 @@ calendarBtn.addEventListener("click", () => {
 
 // Google Calendar API function
 function listUpcomingEvents() {
-  gapi.client.calendar.events.list({
+  const calendarParams = {
     calendarId: 'primary',
     timeMin: new Date().toISOString(),
     showDeleted: false,
     singleEvents: true,
     maxResults: 5,
     orderBy: 'startTime'
-  }).then(response => {
+  };
+
+  // デバッグ用: API呼び出しパラメータを出力
+  console.log("📤 API呼び出しパラメータ:", calendarParams);
+
+  gapi.client.calendar.events.list(calendarParams).then(response => {
     const events = response.result.items;
     console.log("📄 カレンダーイベント取得結果:", events);
     const eventsList = document.getElementById('events');
