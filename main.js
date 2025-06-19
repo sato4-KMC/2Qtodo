@@ -21,8 +21,6 @@ const API_KEY = 'AIzaSyDwWeP04_wH7cW7JbT1OATv5C_JdhG7j74';
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
-let tokenClient; // GIS OAuth 2.0 token client
-
 // Removed GIS OAuth 2.0 token client functions and handleAuthClick, handleClientLoad, initClient, handleCredentialResponse as per instructions
 
 // Firebase Auth setup and login state monitoring
