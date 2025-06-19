@@ -6,20 +6,26 @@ const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
 // Google Calendar API functions
 function handleClientLoad() {
-  gapi.load('client:auth2', initClient);
+  // GIS uses its own initialization, so no need to load gapi client:auth2 here
+  initClient();
 }
 
 function initClient() {
-  gapi.client.init({
-    apiKey: API_KEY,
-    clientId: CLIENT_ID,
-    discoveryDocs: [DISCOVERY_DOC],
-    scope: SCOPES
+  google.accounts.id.initialize({
+    client_id: CLIENT_ID,
+    callback: handleCredentialResponse,
   });
+  google.accounts.id.prompt(); // 自動表示。手動ログインならこの行を削除して別ボタンで呼ぶ
+}
+
+function handleCredentialResponse(response) {
+  console.log("ID Token:", response.credential);
+  // ここでIDトークンを使った認証処理を追加できます
 }
 
 function handleAuthClick() {
-  gapi.auth2.getAuthInstance().signIn();
+  // gapi.auth2 is no longer used with GIS, so this function can be left empty or removed
+  // gapi.auth2.getAuthInstance().signIn({ prompt: 'select_account' });
 }
 
 function listUpcomingEvents() {
