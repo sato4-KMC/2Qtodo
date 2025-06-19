@@ -7,14 +7,14 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="https://apis.google.com/js/api.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div id="modal-bg" class="hidden"></div>
   <div class="top-block">
     <h1>Google Calendar 予定取得</h1>
-  <button onclick="handleAuthClick()">Googleログイン</button>
-  <button onclick="listUpcomingEvents()">予定を取得</button>
+  <button id="login-btn">ログイン</button>
+  <button id="logout-btn" class="hidden">ログアウト</button>
+  <button id="calendar-btn" class="hidden">予定を取得</button>
   <ul id="events"></ul>
 
     <div id="next-event">▶ 次の予定まで 30分</div>
@@ -94,7 +94,7 @@
     </div>
   </div>
 
-  <script src="main.js"></script>
+  <script src="main.js" type="module"></script>
   <script>
     
   </script>

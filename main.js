@@ -1,3 +1,20 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDk9Iq4ZGZ3FhVwgpcGju1LlIRBNmqyZos",
+  authDomain: "qtodo-d8ec8.firebaseapp.com",
+  projectId: "qtodo-d8ec8",
+  storageBucket: "qtodo-d8ec8.firebasestorage.app",
+  messagingSenderId: "508249025548",
+  appId: "1:508249025548:web:68007931abb17fa1415229",
+  measurementId: "G-BSGWZJ0RFL"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
 // Google Calendar API constants
 const CLIENT_ID = '693462078129-6udiv93h2ip1gjkfi1n78vd20nppfvq7.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyDwWeP04_wH7cW7JbT1OATv5C_JdhG7j74';
@@ -6,60 +23,57 @@ const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
 let tokenClient; // GIS OAuth 2.0 token client
 
-// Google Calendar API functions
-function handleClientLoad() {
-  // GIS uses its own initialization, so no need to load gapi client:auth2 here
-  initClient();
-}
+// Removed GIS OAuth 2.0 token client functions and handleAuthClick, handleClientLoad, initClient, handleCredentialResponse as per instructions
 
-function initClient() {
-  // 1) Load gapi client
-  gapi.load('client', async () => {
-    await gapi.client.init({
-      apiKey: API_KEY,
-      discoveryDocs: [DISCOVERY_DOC],
-    });
+// Firebase Auth setup and login state monitoring
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
+provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 
-    // 2) Prepare GIS OAuth2 token client
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: SCOPES,
-      callback: (tokenResponse) => {
-        // 3) Save access token inside gapi
-        gapi.client.setToken({ access_token: tokenResponse.access_token });
-        // 4) Fetch calendar events
-        listUpcomingEvents();
-      },
-    });
-  });
-}
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const calendarBtn = document.getElementById("calendar-btn");
 
-function handleCredentialResponse(response) {
-  console.log("ID Token:", response.credential);
-
-  gapi.load('client', async () => {
-    await gapi.client.init({
-      apiKey: API_KEY,
-      discoveryDocs: [DISCOVERY_DOC],
-    });
-
-    // Set the token
-    gapi.client.setToken({ id_token: response.credential });
-
-    // Fetch and display events
-    listUpcomingEvents();
-  });
-}
-
-function handleAuthClick() {
-  if (!tokenClient) {
-    console.error('Token client not initialized yet.');
-    return;
+loginBtn.addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    alert("ログインに失敗しました");
+    console.error(e);
   }
-  // Opens a GIS popup once; multiple simultaneous requests are prevented
-  tokenClient.requestAccessToken({ prompt: 'consent' });
-}
+});
 
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    loginBtn.classList.add("hidden");
+    logoutBtn.classList.remove("hidden");
+    calendarBtn.classList.remove("hidden");
+
+    const cred = GoogleAuthProvider.credentialFromResult(await signInWithPopup(auth, provider));
+    const token = cred.accessToken;
+
+    await gapi.load("client", async () => {
+      await gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: [DISCOVERY_DOC],
+      });
+      gapi.client.setToken({ access_token: token });
+      listUpcomingEvents();
+    });
+  } else {
+    loginBtn.classList.remove("hidden");
+    logoutBtn.classList.add("hidden");
+    calendarBtn.classList.add("hidden");
+  }
+});
+
+calendarBtn.addEventListener("click", listUpcomingEvents);
+
+// Google Calendar API function
 function listUpcomingEvents() {
   gapi.client.calendar.events.list({
     calendarId: 'primary',
@@ -89,7 +103,6 @@ function listUpcomingEvents() {
   });
 }
 
-window.onload = handleClientLoad;
 const dummyTasks = [
   {
     id: "1",
