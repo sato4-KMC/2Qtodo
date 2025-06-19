@@ -27,8 +27,8 @@ const auth = getAuth();
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 provider.setCustomParameters({
-  prompt: 'consent',
-  access_type: 'offline'
+  prompt: 'consent',          // ✅ 毎回許可画面を出すことで明示的にスコープを要求
+  access_type: 'offline'      // ✅ リフレッシュトークンを取得するために必要
 });
 
 // 🔐 ユーザーがログインボタンをクリックしたとき
@@ -40,6 +40,8 @@ loginBtn.addEventListener("click", async () => {
     const cred = GoogleAuthProvider.credentialFromResult(result);
     const accessToken = cred.accessToken;
     if (accessToken) {
+      console.log("🔑 アクセストークン:", accessToken);
+      // 💡 セッション単位で保持するため、セキュリティを考慮して sessionStorage を使用
       sessionStorage.setItem("google_access_token", accessToken);
     }
     console.log("✅ ログイン成功");
@@ -149,6 +151,7 @@ async function tryListEvents() {
       apiKey: API_KEY,
       discoveryDocs: [DISCOVERY_DOC],
     });
+    console.log("🔍 取得したアクセストークン:", accessToken);
     gapi.client.setToken({ access_token: accessToken });
     console.log("📡 APIにアクセスします（再試行）");
     listUpcomingEvents();
