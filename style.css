@@ -26,6 +26,7 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  border: none;
 }
 
 .top-block-blank {
@@ -42,6 +43,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 6px;
+  border: none;
 }
 
 .top-block-logout {
@@ -54,6 +56,7 @@ body {
   display: none;
   justify-content: center;
   align-items: center;
+  border: none;
 }
 
 .top-block-plan-head {
