@@ -57,7 +57,13 @@ loginBtn.addEventListener("click", async () => {
 
 // 🔓 ログアウト処理
 const logoutBtn = document.getElementById("logout-btn");
+const logoutBtnBlank = document.getElementById("logout-btn-blank");
 logoutBtn.addEventListener("click", async () => {
+  console.log("🔴 ログアウトします");
+  sessionStorage.removeItem("google_access_token");
+  await signOut(auth);
+});
+logoutBtnBlank.addEventListener("click", async () => {
   console.log("🔴 ログアウトします");
   sessionStorage.removeItem("google_access_token");
   await signOut(auth);
