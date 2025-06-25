@@ -66,16 +66,37 @@ logoutBtn.addEventListener("click", async () => {
 // 👤 認証状態の変化を監視
 const calendarBtn = document.getElementById("calendar-btn");
 onAuthStateChanged(auth, async (user) => {
+  const planBlock = document.querySelector('.top-block-plan');
+  const blankBlock = document.querySelector('.top-block-blank');
+  const logoutBlock = document.querySelector('.top-block-logout');
   if (user) {
     console.log("✅ ログイン状態を検出:", user.email);
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     calendarBtn.classList.remove("hidden");
+
+    // 全て非表示にしてからカレンダー予定取得後に切り替え
+    if (planBlock) planBlock.style.display = "none";
+    if (blankBlock) blankBlock.style.display = "none";
+    if (logoutBlock) logoutBlock.style.display = "none";
+
+    // カレンダー予定を取得してから表示切り替え
+    listUpcomingEvents().then(hasEvent => {
+      if (hasEvent) {
+        if (planBlock) planBlock.style.display = "flex";
+      } else {
+        if (blankBlock) blankBlock.style.display = "flex";
+      }
+    });
   } else {
     console.log("👋 ログアウト状態です");
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
     calendarBtn.classList.add("hidden");
+    // ログアウト時はログアウトブロックのみ表示
+    if (logoutBlock) logoutBlock.style.display = "flex";
+    if (planBlock) planBlock.style.display = "none";
+    if (blankBlock) blankBlock.style.display = "none";
   }
 });
 
@@ -123,7 +144,8 @@ function listUpcomingEvents() {
 
   console.log("📤 API呼び出しパラメータ:", calendarParams);
 
-  gapi.client.calendar.events.list(calendarParams).then(response => {
+  // Promise化して予定有無を返す
+  return gapi.client.calendar.events.list(calendarParams).then(response => {
     const events = response.result.items;
     console.log("📄 カレンダーイベント取得結果:", events);
     const detail = document.getElementById('event-detail');
@@ -134,7 +156,7 @@ function listUpcomingEvents() {
       detail.innerHTML = '予定は見つかりませんでした。';
       nextEvent.textContent = `▼ 次の予定はないです`;
       detail.classList.remove("hidden");
-      return;
+      return false;
     }
 
     const event = events[0];
@@ -157,8 +179,10 @@ function listUpcomingEvents() {
 
     const timeDiffMin = Math.round((start - new Date()) / (1000 * 60));
     nextEvent.textContent = `▼ 次の予定まで ${timeDiffMin}分`;
+    return true;
   }).catch(error => {
     console.error("❌ APIエラー内容:", error);
+    return false;
   });
 }
 

@@ -10,68 +10,50 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <div id="modal-bg" class="hidden"></div>
-  <div class="top-block">
-    <h1>Google Calendar 予定取得</h1>
-  <button id="login-btn">ログイン</button>
-  <button id="logout-btn" class="hidden">ログアウト</button>
-  <button id="calendar-btn" class="hidden">予定を取得</button>
-  <ul id="events"></ul>
-
-    <div id="next-event">▶ 次の予定まで 30分</div>
-    <div class="event-detail hidden" id="event-detail">
-      <!-- どうも、ここまできてくれたんですね<br>
-      16:30-17:00<br>
-      説明<br>
-      <a href="#">URL</a> -->
-    </div>
-    <!-- <div class="task-card suggested">
-      <div class="task-time">15分</div>
-      <div>
-        <div class="task-title">CG課題</div>
-        <div class="task-level">レベル4</div>
+  <div class="top-block-plan">
+    <div class="top-block-plan-head">
+      <div class="top-block-plan-time">
+        <span class="material-icons" style="font-size: 24px;">alarm</span>
+        <span style="font-size: 30px; font-weight: bold;">30</span>
+        <span style="font-size: 14px;">分後</span>
       </div>
-    </div> -->
+      <div class="logout">
+        <span class="material-icons">logout</span>
+      </div>
+    </div>
+    <div style="font-size: 22px; font-weight: bold;">技研さんMTG</div>
+    <div style="font-size: 14px;">説明 MTGリンクHTML</div>
   </div>
-
-  <div class="middle-block">
-    <div class="task-list-title">タスク一覧</div>
-    <!-- <div class="task-card">
-      <div class="task-time">15分</div>
-      <div>
-        <div class="task-title">CG課題</div>
-        <div class="task-level">レベル4</div>
-      </div>
-    </div> -->
+  <div class="top-block-blank">
+    <div class="logout">
+      <span class="material-icons">logout</span>
+    </div>
+    予定なし
   </div>
-
-  <div class="bottom-block">
-    <div id="task-input-view">
-      <textarea id="bottom-block-input" placeholder="タスクを追加" rows="1" oninput="resizeTextarea(this)"></textarea>
-      <div class="bottom-block-column">
-        <button id="expand-input-btn" disabled="false" onclick="alert('test')">
-          <span class="material-icons" id="expand-input-icon">open_in_full</span>
-        </button>
-        <button id="next-task-btn" onclick="setTask()">
-          <span class="material-icons" id="next-task-icon">arrow_forward</span>
-        </button>
-      </div>
+  <div class="top-block-logout">
+    Googleログイン
+  </div>
+  <div class="tab-block">
+    <div class="tab-block-text">
+      <span class="material-icons">
+        reviews
+      </span>
+      <span style="font-size: 22px; font-weight: bold; margin-left: 3px;">
+        おすすめのタスク
+      </span>
     </div>
-    <div id="task-setting-view">
-      <div class="task-setting-view-time">
-        <label class="bottom-block-column-label">必要時間</label>
-        <h2 id="duration-label">15分</h2>
-        <input type="range" id="duration-range" min="1" max="60" value="15" oninput="updateDurationLabel()">
-      </div>
-      <div class="task-setting-view-priority">
-        <label class="bottom-block-column-label">優先度レベル</label>
-        <h2 id="level-label">レベル 3</h2>
-        <input type="range" id="level-range" min="1" max="5" value="3" oninput="updateLevelLabel()">
-      </div>
-      <button id="add-task-btn" onclick="addTask()">
-        <span class="material-icons" id="add-task-icon">send</span>
-         追加</button>
+    <div class="tab-block-button">
+      <span class="material-icons">
+        autorenew
+      </span>
     </div>
+  </div>
+  <div class="card-scroll-container">
+    <div class="card-add"></div>
+    <div class="card" id="initial-card">カード1</div>
+    <div class="card">カード2</div>
+    <div class="card">カード3</div>
+    <div class="card-sized-box"></div>
   </div>
 
   <script src="main.js" type="module"></script>

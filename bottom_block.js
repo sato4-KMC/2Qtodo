@@ -129,9 +129,14 @@ const dummyTasks = savedTasks || [
     toggleSettingView(true);
   }
   
-  document.addEventListener('DOMContentLoaded', () => {
-    renderTasks();
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  renderTasks();
+  // Scroll the first card into view on page load
+  const initialCard = document.getElementById("initial-card");
+  if (initialCard) {
+    initialCard.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+});
   
   function addTask() {
     const taskInput = document.getElementById("bottom-block-input");
