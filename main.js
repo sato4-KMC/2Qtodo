@@ -161,3 +161,5 @@ async function fetchTodayNextEvent() {
     return null;
   }
 }
+
+window.fetchTodayNextEvent = fetchTodayNextEvent;

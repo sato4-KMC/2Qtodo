@@ -178,3 +178,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const value = document.getElementById('level-range').value;
     document.getElementById('level-label').textContent = `レベル ${value}`;
   }
+
+  
