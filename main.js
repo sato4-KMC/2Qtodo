@@ -93,6 +93,34 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+function watchAuthState() {
+  onAuthStateChanged(auth, async (user) => {
+    const planBlock = document.querySelector('.top-block-plan');
+    const blankBlock = document.querySelector('.top-block-blank');
+    const logoutBlock = document.querySelector('.top-block-logout');
+
+    if (user) {
+      console.log("✅ ログイン状態を検出:", user.email);
+      if (planBlock) planBlock.style.display = "none";
+      if (blankBlock) blankBlock.style.display = "none";
+      if (logoutBlock) logoutBlock.style.display = "none";
+
+      listUpcomingEvents().then(hasEvent => {
+        if (hasEvent) {
+          if (planBlock) planBlock.style.display = "flex";
+        } else {
+          if (blankBlock) blankBlock.style.display = "flex";
+        }
+      });
+    } else {
+      console.log("👋 ログアウト状態です");
+      if (logoutBlock) logoutBlock.style.display = "flex";
+      if (planBlock) planBlock.style.display = "none";
+      if (blankBlock) blankBlock.style.display = "none";
+    }
+  });
+}
+
 // 既存 onAuthStateChanged の後に追加
 window.onload = () => {
   gapi.load('client', async () => {
@@ -101,6 +129,7 @@ window.onload = () => {
       discoveryDocs: [DISCOVERY_DOC]
     });
 
+    // gapi.client 初期化が完了した後に onAuthStateChanged を設定
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
@@ -110,6 +139,9 @@ window.onload = () => {
         tryListEvents(accessToken);  // GISで取得したトークンで予定取得
       }
     });
+
+    // ✅ gapi初期化が終わった後に認証監視を開始
+    watchAuthState();
   });
 };
 
