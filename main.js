@@ -73,17 +73,16 @@ onAuthStateChanged(auth, async (user) => {
     console.log("✅ ログイン状態を検出:", user.email);
     // 全て非表示にしてからカレンダー予定取得後に切り替え
     if (planBlock) planBlock.style.display = "none";
-    if (blankBlock) blankBlock.style.display = "none";
+    if (blankBlock) blankBlock.style.display = "flex";
     if (logoutBlock) logoutBlock.style.display = "none";
 
-    // カレンダー予定を取得してから表示切り替え
-    listUpcomingEvents().then(hasEvent => {
-      if (hasEvent) {
-        if (planBlock) planBlock.style.display = "flex";
-      } else {
-        if (blankBlock) blankBlock.style.display = "flex";
-      }
-    });
+    const nextEvent = await fetchTodayNextEvent();
+    if (nextEvent) {
+      console.log("📌 表示用予定タイトル:", nextEvent.summary);
+      if (planBlock) planBlock.style.display = "flex";
+      if (blankBlock) blankBlock.style.display = "none";
+    }
+
   } else {
     console.log("👋 ログアウト状態です");
     // ログアウト時はログアウトブロックのみ表示
@@ -102,16 +101,15 @@ function watchAuthState() {
     if (user) {
       console.log("✅ ログイン状態を検出:", user.email);
       if (planBlock) planBlock.style.display = "none";
-      if (blankBlock) blankBlock.style.display = "none";
+      if (blankBlock) blankBlock.style.display = "flex";
       if (logoutBlock) logoutBlock.style.display = "none";
 
-      listUpcomingEvents().then(hasEvent => {
-        if (hasEvent) {
-          if (planBlock) planBlock.style.display = "flex";
-        } else {
-          if (blankBlock) blankBlock.style.display = "flex";
-        }
-      });
+      const nextEvent = await fetchTodayNextEvent();
+      if (nextEvent) {
+        console.log("📌 表示用予定タイトル:", nextEvent.summary);
+        if (planBlock) planBlock.style.display = "flex";
+        if (blankBlock) blankBlock.style.display = "none";
+      }
     } else {
       console.log("👋 ログアウト状態です");
       if (logoutBlock) logoutBlock.style.display = "flex";
@@ -145,15 +143,14 @@ window.onload = () => {
   });
 };
 
-// Google Calendar API function
-function listUpcomingEvents() {
+async function fetchTodayNextEvent() {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
   const calendarParams = {
     calendarId: 'primary',
-    timeMin: todayStart.toISOString(),
+    timeMin: now.toISOString(),        // Only from now onwards
     timeMax: todayEnd.toISOString(),
     showDeleted: false,
     singleEvents: true,
@@ -161,55 +158,20 @@ function listUpcomingEvents() {
     orderBy: 'startTime'
   };
 
-  console.log("📤 API呼び出しパラメータ:", calendarParams);
+  console.log("📤 直近予定取得APIパラメータ:", calendarParams);
 
-  // Promise化して予定有無を返す
-  return gapi.client.calendar.events.list(calendarParams).then(response => {
+  try {
+    const response = await gapi.client.calendar.events.list(calendarParams);
     const events = response.result.items;
-    console.log("📄 カレンダーイベント取得結果:", events);
-    const detail = document.getElementById('event-detail');
-    const nextEvent = document.getElementById("next-event");
-    detail.innerHTML = '';
-
-    if (events.length === 0) {
-      detail.innerHTML = '予定は見つかりませんでした。';
-      nextEvent.textContent = `▼ 次の予定はないです`;
-      detail.classList.remove("hidden");
-      return false;
+    if (events && events.length > 0) {
+      console.log("📄 直近予定:", events[0]);
+      return events[0];
+    } else {
+      console.log("📭 今日の残り予定はありません");
+      return null;
     }
-
-    const event = events[0];
-    const title = event.summary || "タイトルなし";
-    const description = event.description || "説明なし";
-    const start = new Date(event.start.dateTime || event.start.date);
-    const end = new Date(event.end.dateTime || event.end.date);
-    const durationMin = Math.round((end - start) / (1000 * 60));
-    const startTimeStr = `${start.getHours()}:${String(start.getMinutes()).padStart(2, '0')}`;
-    const endTimeStr = `${end.getHours()}:${String(end.getMinutes()).padStart(2, '0')}`;
-    const htmlLink = event.htmlLink || "#";
-
-    detail.innerHTML = `
-      ${title}<br>
-      ${startTimeStr} - ${endTimeStr}（${durationMin}分間）<br>
-      ${description}<br>
-      <a href="${htmlLink}" target="_blank">URL</a>
-    `;
-    detail.classList.remove("hidden");
-
-    const timeDiffMin = Math.round((start - new Date()) / (1000 * 60));
-    nextEvent.textContent = `▼ 次の予定まで ${timeDiffMin}分`;
-    return true;
-  }).catch(error => {
-    console.error("❌ APIエラー内容:", error);
-    return false;
-  });
-}
-
-// tryListEvents を accessToken 引数付きに変更
-async function tryListEvents(accessToken) {
-  if (!accessToken) throw new Error("アクセストークンがありません");
-
-  gapi.client.setToken({ access_token: accessToken });
-  console.log("📡 APIにアクセスします");
-  listUpcomingEvents();
+  } catch (error) {
+    console.error("❌ 直近予定取得エラー:", error);
+    return null;
+  }
 }
