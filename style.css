@@ -78,6 +78,11 @@ body {
   align-items: center;
 }
 
+.logout button {
+  background-color: transparent;
+  border: none;
+}
+
 .tab-block {
   margin: 10vw;
   width: 80vw;
