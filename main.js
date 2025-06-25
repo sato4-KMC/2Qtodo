@@ -100,22 +100,27 @@ function watchAuthState() {
 window.onload = () => {
   gapi.load('client', async () => {
     await gapi.client.init({
-      apiKey: API_KEY,
       discoveryDocs: [DISCOVERY_DOC]
+      // ✅ apiKey を削除
     });
 
-    // gapi.client 初期化が完了した後に onAuthStateChanged を設定
+    // ✅ アクセストークンを gapi に設定（あれば）
+    const accessTokenStored = sessionStorage.getItem("google_access_token");
+    if (accessTokenStored) {
+      gapi.client.setToken({ access_token: accessTokenStored });
+    }
+
+    // tokenClient 初期化（GISログイン用）も維持
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPES,
       callback: (tokenResponse) => {
         accessToken = tokenResponse.access_token;
-        console.log("🔑 GISアクセストークン:", accessToken);
-        tryListEvents(accessToken);  // GISで取得したトークンで予定取得
+        sessionStorage.setItem("google_access_token", accessToken);
+        gapi.client.setToken({ access_token: accessToken }); // これも追加
       }
     });
 
-    // ✅ gapi初期化が終わった後に認証監視を開始
     watchAuthState();
   });
 };
