@@ -64,17 +64,13 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 // 👤 認証状態の変化を監視
-const calendarBtn = document.getElementById("calendar-btn");
+// const calendarBtn = document.getElementById("calendar-btn");
 onAuthStateChanged(auth, async (user) => {
   const planBlock = document.querySelector('.top-block-plan');
   const blankBlock = document.querySelector('.top-block-blank');
   const logoutBlock = document.querySelector('.top-block-logout');
   if (user) {
     console.log("✅ ログイン状態を検出:", user.email);
-    loginBtn.classList.add("hidden");
-    logoutBtn.classList.remove("hidden");
-    calendarBtn.classList.remove("hidden");
-
     // 全て非表示にしてからカレンダー予定取得後に切り替え
     if (planBlock) planBlock.style.display = "none";
     if (blankBlock) blankBlock.style.display = "none";
@@ -90,9 +86,6 @@ onAuthStateChanged(auth, async (user) => {
     });
   } else {
     console.log("👋 ログアウト状態です");
-    loginBtn.classList.remove("hidden");
-    logoutBtn.classList.add("hidden");
-    calendarBtn.classList.add("hidden");
     // ログアウト時はログアウトブロックのみ表示
     if (logoutBlock) logoutBlock.style.display = "flex";
     if (planBlock) planBlock.style.display = "none";
@@ -119,12 +112,6 @@ window.onload = () => {
     });
   });
 };
-
-// 📅 Googleカレンダー予定を取得
-calendarBtn.addEventListener("click", () => {
-  console.log("📥 予定の取得を開始");
-  safeListEvents();
-});
 
 // Google Calendar API function
 function listUpcomingEvents() {
@@ -184,22 +171,6 @@ function listUpcomingEvents() {
     console.error("❌ APIエラー内容:", error);
     return false;
   });
-}
-
-// safeListEvents 関数を書き換え
-async function safeListEvents() {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("ログインしてください");
-    return;
-  }
-
-  try {
-    tokenClient.requestAccessToken({ prompt: 'consent' });
-  } catch (err) {
-    console.error("❌ GISトークン取得失敗:", err);
-    alert("カレンダーアクセスに失敗しました。");
-  }
 }
 
 // tryListEvents を accessToken 引数付きに変更
