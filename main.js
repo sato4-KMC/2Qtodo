@@ -63,35 +63,6 @@ logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
 });
 
-// 👤 認証状態の変化を監視
-// const calendarBtn = document.getElementById("calendar-btn");
-onAuthStateChanged(auth, async (user) => {
-  const planBlock = document.querySelector('.top-block-plan');
-  const blankBlock = document.querySelector('.top-block-blank');
-  const logoutBlock = document.querySelector('.top-block-logout');
-  if (user) {
-    console.log("✅ ログイン状態を検出:", user.email);
-    // 全て非表示にしてからカレンダー予定取得後に切り替え
-    if (planBlock) planBlock.style.display = "none";
-    if (blankBlock) blankBlock.style.display = "flex";
-    if (logoutBlock) logoutBlock.style.display = "none";
-
-    const nextEvent = await fetchTodayNextEvent();
-    if (nextEvent) {
-      console.log("📌 表示用予定タイトル:", nextEvent.summary);
-      if (planBlock) planBlock.style.display = "flex";
-      if (blankBlock) blankBlock.style.display = "none";
-    }
-
-  } else {
-    console.log("👋 ログアウト状態です");
-    // ログアウト時はログアウトブロックのみ表示
-    if (logoutBlock) logoutBlock.style.display = "flex";
-    if (planBlock) planBlock.style.display = "none";
-    if (blankBlock) blankBlock.style.display = "none";
-  }
-});
-
 function watchAuthState() {
   onAuthStateChanged(auth, async (user) => {
     const planBlock = document.querySelector('.top-block-plan');
@@ -145,12 +116,16 @@ window.onload = () => {
 
 async function fetchTodayNextEvent() {
   const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+  const accessTokenStored = sessionStorage.getItem("google_access_token");
+  if (accessTokenStored) {
+    gapi.client.setToken({ access_token: accessTokenStored });
+  }
 
   const calendarParams = {
     calendarId: 'primary',
-    timeMin: now.toISOString(),        // Only from now onwards
+    timeMin: now.toISOString(),
     timeMax: todayEnd.toISOString(),
     showDeleted: false,
     singleEvents: true,
