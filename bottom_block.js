@@ -1,6 +1,7 @@
 
 // タスク処理・UI関連関数
-const dummyTasks = [
+const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+const dummyTasks = savedTasks || [
     {
       id: "1",
       title: "プレゼン資料作り",
@@ -28,6 +29,12 @@ const dummyTasks = [
   ];
   
   function renderTasks() {
+    // Load latest tasks from localStorage if available
+    const savedTasks = JSON.parse(localStorage.getItem("tasks"));
+    if (savedTasks) {
+      dummyTasks.length = 0;
+      dummyTasks.push(...savedTasks);
+    }
     const container = document.querySelector('.middle-block');
     if (!container) return;
   
@@ -138,6 +145,7 @@ const dummyTasks = [
       completed: false,
     }
     dummyTasks.push(newTask);
+    localStorage.setItem("tasks", JSON.stringify(dummyTasks));
     document.getElementById('task-input-view').style.display = 'flex';
     document.getElementById('task-setting-view').style.display = 'none';
     document.querySelector('.bottom-block').style.height = '100px';
