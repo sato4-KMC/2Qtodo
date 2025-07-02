@@ -10,29 +10,31 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <div class="top-block-plan">
-    <div class="top-block-plan-head">
-      <div class="top-block-plan-time">
-        <span class="material-icons" style="font-size: 24px;">alarm</span>
-        <span style="font-size: 30px; font-weight: bold;">30</span>
-        <span style="font-size: 14px;">分後</span>
+  <div class="top-block-container">
+    <div class="top-block-plan">
+      <div class="top-block-plan-head">
+        <div class="top-block-plan-time">
+          <span class="material-icons" style="font-size: 24px;">alarm</span>
+          <span style="font-size: 30px; font-weight: bold;">30</span>
+          <span style="font-size: 14px;">分後</span>
+        </div>
+        <div class="logout">
+          <button id="logout-btn" class="material-icons">logout</button>
+        </div>
       </div>
+      <div style="font-size: 22px; font-weight: bold;">技研さんMTG</div>
+      <div style="font-size: 14px;">説明 MTGリンクHTML</div>
+    </div>
+    <div class="top-block-blank">
       <div class="logout">
-        <button id="logout-btn" class="material-icons">logout</button>
+        <button id="logout-btn-blank" class="material-icons">logout</button>
       </div>
+      予定なし
     </div>
-    <div style="font-size: 22px; font-weight: bold;">技研さんMTG</div>
-    <div style="font-size: 14px;">説明 MTGリンクHTML</div>
+    <button id="login-btn" class="top-block-logout">
+      Googleログイン
+    </button>
   </div>
-  <div class="top-block-blank">
-    <div class="logout">
-      <button id="logout-btn-blank" class="material-icons">logout</button>
-    </div>
-    予定なし
-  </div>
-  <button id="login-btn" class="top-block-logout">
-    Googleログイン
-  </button>
   <div class="tab-block">
     <div class="tab-block-text">
       <span class="material-icons">
@@ -49,11 +51,152 @@
     </button>
   </div>
   <div class="card-scroll-container">
-    <div class="card-add"></div>
-    <div class="card" id="initial-card">カード1</div>
-    <div class="card">カード2</div>
+    <div class="card-add">
+      <input class="input-underline" type="text" placeholder="プロジェクト名" />
+      <div class="task-container">
+        <div class="task">
+          <div class="task-minute">
+            252
+          </div>
+          <div class="task-title">
+            タスク名
+          </div>
+          <div class="task-checkbox">
+            <input type="checkbox" />
+          </div>
+        </div>
+        <div class="task">
+          <div class="task-minute">
+            252
+          </div>
+          <div class="task-title">
+            タスク名
+          </div>
+          <div class="task-checkbox">
+            <input type="checkbox" />
+          </div>
+        </div>
+        <div class="task">
+          <div class="task-minute">
+            252
+          </div>
+          <div class="task-title">
+            タスク名
+          </div>
+          <div class="task-checkbox">
+            <input type="checkbox" />
+          </div>
+        </div>
+      </div>
+      <div class="task-add">
+        <div class="task-minute">
+          <input type="number" placeholder="分数" maxlength="3" max="999" min="0" />
+        </div>
+        <div class="task-title">
+          <input type="text" placeholder="タスク名を入力" />
+        </div>
+        <div class="task-checkbox">
+          <button class="task-add-button">
+            <span class="material-icons">
+              add
+            </span>
+          </button>
+        </div>
+      </div>
+      <button class="pj-add-button">
+        <span class="material-icons">
+          add
+        </span>
+        追加する
+      </button>
+    </div>
+    <div class="card" id="initial-card">
+      <div class="card-title">タスク名</div>
+      <div class="task-container">
+        <div class="task">
+          <div class="task-minute">
+            252
+          </div>
+          <div class="task-title">
+            タスク名
+          </div>
+          <div class="task-checkbox">
+            <input type="checkbox" />
+          </div>
+        </div>
+        <div class="task">
+          <div class="task-minute">
+            252
+          </div>
+          <div class="task-title">
+            タスク名
+          </div>
+          <div class="task-checkbox">
+            <input type="checkbox" />
+          </div>
+        </div>
+        <div class="task">
+          <div class="task-minute">
+            252
+          </div>
+          <div class="task-title">
+            タスク名
+          </div>
+          <div class="task-checkbox">
+            <input type="checkbox" />
+          </div>
+        </div>
+      </div>
+      <div class="task-add">
+        <div class="task-minute">
+          <input type="number" placeholder="分数" maxlength="3" max="999" min="0" />
+        </div>
+        <div class="task-title">
+          <input type="text" placeholder="タスク名を入力" />
+        </div>
+        <div class="task-checkbox">
+          <button class="task-add-button">
+            <span class="material-icons">
+              add
+            </span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="card-bottom-progress">
+        <div class="progress-number">
+          <span class="current">14</span><span class="total">/30</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width: 47%;"></div>
+        </div>
+      </div>
+    </div>
     <div class="card">カード3</div>
     <div class="card-sized-box"></div>
+  </div>
+  <div class="tab-block">
+    <div class="tab-block-text">
+      <span class="material-icons">
+        list
+      </span>
+      <span style="font-size: 22px; font-weight: bold; margin-left: 3px;">
+        タスク一覧
+      </span>
+    </div>
+  </div>
+  <div class="card-list-container">
+    <div class="task">
+      <div class="task-minute">
+        252
+      </div>
+      <div class="task-title">
+        タスク名
+      </div>
+      <div class="task-checkbox">
+        <input type="checkbox" />
+      </div>
+    </div>
   </div>
 
   <script src="main.js" type="module"></script>
