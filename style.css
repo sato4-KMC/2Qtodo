@@ -467,19 +467,19 @@ body {
     height: 33vh;
   }
   .tab-block-logout {
-    width: calc(33vw - 6vw);
-    margin: 3vw;
-    height: 33vh;
+    margin: 0;
+    width: 100%;
+    height: 100%;
   }
   .tab-block-blank {
-    width: calc(33vw - 6vw);
-    margin: 3vw;
-    height: 33vh;
+    margin: 0;
+    width: 100%;
+    height: 100%;
   }
   .tab-block-plan {
-    width: calc(33vw - 6vw);
-    margin: 3vw;
-    height: 33vh;
+    margin: 0;
+    width: 100%;
+    height: 100%;
   }
   #recommend {
     width: 33vw;

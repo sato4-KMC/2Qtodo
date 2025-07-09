@@ -86,6 +86,28 @@ function watchAuthState() {
         console.log("📌 表示用予定タイトル:", nextEvent.summary);
         if (planBlock) planBlock.style.display = "flex";
         if (blankBlock) blankBlock.style.display = "none";
+
+        // 分数表示用span（2番目のspan）
+        const planTimeSpan = planBlock.querySelector('.top-block-plan-time span:nth-child(2)');
+        // タイトル用div（font-size:22px, bold）
+        const planTitleDiv = planBlock.querySelector('div[style*="font-size: 22px"][style*="font-weight: bold"]');
+        // 説明用div（font-size:14px で、top-block-plan-time内span以外）
+        // 22pxでない14pxのdivを取得
+        const planDescDivs = planBlock.querySelectorAll('div[style*="font-size: 14px;"]');
+        let planDescDiv = null;
+        planDescDivs.forEach(div => {
+          // top-block-plan-time内のspanではないdivを選ぶ
+          if (!div.closest('.top-block-plan-time')) planDescDiv = div;
+        });
+
+        // 何分後か計算
+        const now = new Date();
+        const start = new Date(nextEvent.start?.dateTime || nextEvent.start?.date);
+        const diffMin = Math.max(0, Math.floor((start - now) / 60000));
+
+        if (planTimeSpan) planTimeSpan.textContent = diffMin;
+        if (planTitleDiv) planTitleDiv.textContent = nextEvent.summary || "";
+        if (planDescDiv) planDescDiv.textContent = nextEvent.description || "";
       }
     } else {
       console.log("👋 ログアウト状態です");
