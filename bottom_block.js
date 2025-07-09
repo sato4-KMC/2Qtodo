@@ -229,6 +229,7 @@ function renderTasksList() {
     noTasksDiv.style.textAlign = "center";
     noTasksDiv.style.padding = "20px";
     noTasksDiv.style.color = "var(--blue)";
+    noTasksDiv.style.fontWeight = "bold";
     noTasksDiv.innerHTML = "タスクがありません";
     tasksContainer.appendChild(noTasksDiv);
   }

@@ -190,9 +190,23 @@ window.fetchTodayNextEvent = fetchTodayNextEvent;
 // ダークモード切り替えボタンの処理
 window.addEventListener('DOMContentLoaded', () => {
   const darkmodeBtn = document.getElementById('floating-darkmode-btn');
+  const darkmodeIcon = document.getElementById('darkmode-icon');
+
+  function updateDarkModeIcon() {
+    if (document.body.classList.contains('dark-mode')) {
+      darkmodeIcon.textContent = 'light_mode';
+    } else {
+      darkmodeIcon.textContent = 'dark_mode';
+    }
+  }
+
   if (darkmodeBtn) {
     darkmodeBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
+      updateDarkModeIcon();
     });
   }
+
+  // 初期表示時も正しいアイコンに
+  updateDarkModeIcon();
 });
