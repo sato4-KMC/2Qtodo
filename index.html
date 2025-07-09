@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskPilot</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="top-block-container">
+    <div class="top-block-plan">
+      <div class="top-block-plan-head">
+        <div class="top-block-plan-time">
+          <span class="material-icons" style="font-size: 24px;">alarm</span>
+          <span style="font-size: 30px; font-weight: bold;">30</span>
+          <span style="font-size: 14px;">分後</span>
+        </div>
+        <div class="logout">
+          <button id="logout-btn" class="material-icons">logout</button>
+        </div>
+      </div>
+      <div style="font-size: 22px; font-weight: bold;">技研さんMTG</div>
+      <div style="font-size: 14px;">説明 MTGリンクHTML</div>
+    </div>
+    <div class="top-block-blank">
+      <div class="logout">
+        <button id="logout-btn-blank" class="material-icons">logout</button>
+      </div>
+      予定なし
+    </div>
+    <button id="login-btn" class="top-block-logout">
+      Googleログイン
+    </button>
+  </div>
+  <section id="recommend">
+    <div class="tab-block">
+      <div class="tab-block-text">
+        <span class="material-icons">
+          reviews
+        </span>
+        <span style="font-size: 22px; font-weight: bold; margin-left: 3px;">
+          おすすめのタスク
+        </span>
+      </div>
+      <button class="tab-block-button" onclick="fetchTodayNextEvent(); renderTasks();"> 
+        <span class="material-icons">
+          autorenew
+        </span>
+      </button>
+    </div>
+    <div class="card-scroll-container">
+      <div class="card-add" data-pjid="global-pjid">
+        <input class="input-underline" type="text" placeholder="プロジェクト名" />
+        <div class="task-container">
+          
+        </div>
+        <div class="task-add">
+          <div class="task-minute">
+            <input type="number" placeholder="分数" maxlength="3" max="999" min="0" />
+          </div>
+          <div class="task-title">
+            <input type="text" placeholder="タスク名を入力" />
+          </div>
+          <div class="task-checkbox">
+            <button class="task-add-button" data-pjid="global-pjid">
+              <span class="material-icons">
+                add
+              </span>
+            </button>
+          </div>
+        </div>
+        <button class="pj-add-button">
+          <span class="material-icons">
+            add
+          </span>
+          追加する
+        </button>
+      </div>
+      <div class="card" id="initial-card" data-pjid="your-pjid-here">
+        <div class="card-title">タスク名</div>
+        <div class="task-container">
+          
+        </div>
+        <div class="task-add">
+          <div class="task-minute">
+            <input type="number" placeholder="分数" maxlength="3" max="999" min="0" />
+          </div>
+          <div class="task-title">
+            <input type="text" placeholder="タスク名を入力" />
+          </div>
+          <div class="task-checkbox">
+            <button class="task-add-button" data-pjid="your-pjid-here">
+              <span class="material-icons">
+                add
+              </span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="card-bottom-progress">
+          <div class="progress-number">
+            <span class="current">14</span><span class="total">/30</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 47%;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">カード3</div>
+      <div class="card-sized-box"></div>
+    </div>
+  </section>
+  <section id="tasks">
+    <div class="tab-block">
+      <div class="tab-block-text">
+        <span class="material-icons">
+          list
+        </span>
+        <span style="font-size: 22px; font-weight: bold; margin-left: 3px;">
+          タスク一覧
+        </span>
+      </div>
+    </div>
+    <div class="card-list-container">
+      
+    </div>
+  </section>
+
+  <script src="main.js" type="module"></script>
+  <script src="bottom_block.js"></script>
+</body></html>
