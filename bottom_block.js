@@ -60,7 +60,9 @@ function renderTasks(projectId = null) {
     // .task-add 以外を削除
     container.querySelectorAll('.task').forEach(e => e.remove());
 
-    list.forEach((task) => {
+    // sortTasksで並べ替え
+    const sortedTasks = sortTasks(list, window.nextEvent);
+    sortedTasks.forEach((task) => {
       const taskDiv = document.createElement("div");
       taskDiv.className = "task";
       taskDiv.innerHTML = `
@@ -76,6 +78,9 @@ function renderTasks(projectId = null) {
         if (t) {
           t.completed = this.checked;
           saveDB("tasks", allTasks);
+          // ここで画面再描画を呼ぶのが正解！
+          renderTasks(task.pjId); // ← プロジェクトごとのタスク再描画
+          renderTasksList();      // ← タスク一覧再描画
         }
       });
       container.insertBefore(taskDiv, container.querySelector('.task-add'));
@@ -95,10 +100,7 @@ function renderTasks(projectId = null) {
     }
     const progressBarFill = card.querySelector('.progress-bar-fill');
     if (progressBarFill) progressBarFill.style.width = percent + '%';
-
-    renderTasks(projectId);
-    renderTasksList();
-
+    
   } else {
     // 全プロジェクトを対象に描画
     const cards = document.querySelectorAll('.card');
@@ -111,7 +113,9 @@ function renderTasks(projectId = null) {
       container.querySelectorAll('.task').forEach(e => e.remove());
 
       const tasksForThisProject = allTasks.filter(t => t.pjId === pjId);
-      tasksForThisProject.forEach((task) => {
+      // sortTasksで並べ替え
+      const sortedTasks = sortTasks(tasksForThisProject, window.nextEvent);
+      sortedTasks.forEach((task) => {
         const taskDiv = document.createElement("div");
         taskDiv.className = "task";
         taskDiv.innerHTML = `
@@ -127,6 +131,8 @@ function renderTasks(projectId = null) {
           if (t) {
             t.completed = this.checked;
             saveDB("tasks", allTasks);
+            renderTasks(task.pjId);
+            renderTasksList();
           }
         });
         container.insertBefore(taskDiv, container.querySelector('.task-add'));
@@ -148,6 +154,20 @@ function renderTasks(projectId = null) {
   }
 }
 
+// nextEventをグローバルで保持
+window.nextEvent = null;
+
+// nextEventまでに終わる未完了タスクを所要時間順で返す
+function sortTasks(tasks, nextEvent) {
+  if (!nextEvent) return tasks;
+  const now = new Date();
+  const start = new Date(nextEvent.start?.dateTime || nextEvent.start?.date);
+  const remainMin = Math.floor((start - now) / 60000);
+  return tasks
+    .filter(t => !t.completed && t.durationMin <= remainMin)
+    .sort((a, b) => a.durationMin - b.durationMin);
+}
+
 // タスク一覧セクションに全タスクを表示
 function renderTasksList() {
   const allTasks = loadDB("tasks", []);
@@ -158,8 +178,9 @@ function renderTasksList() {
   // 既存のタスクをクリア
   tasksContainer.innerHTML = '';
   
-  // 全タスクを表示
-  allTasks.forEach((task) => {
+  // nextEventまでに終わるタスクを所要時間順で表示
+  const sortedTasks = sortTasks(allTasks, window.nextEvent);
+  sortedTasks.forEach((task) => {
     const taskDiv = document.createElement("div");
     taskDiv.className = "task";
     taskDiv.innerHTML = `
@@ -180,6 +201,8 @@ function renderTasksList() {
     checkbox.addEventListener('change', function() {
       task.completed = this.checked;
       saveDB("tasks", allTasks);
+      renderTasks(task.pjId);
+      renderTasksList();
     });
     
     // 削除ボタンのイベントリスナーを追加
@@ -193,7 +216,7 @@ function renderTasksList() {
   });
   
   // タスクが存在しない場合のメッセージ
-  if (allTasks.length === 0) {
+  if (sortedTasks.length === 0) {
     const noTasksDiv = document.createElement("div");
     noTasksDiv.style.textAlign = "center";
     noTasksDiv.style.padding = "20px";

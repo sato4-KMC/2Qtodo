@@ -83,6 +83,7 @@ function watchAuthState() {
 
       const nextEvent = await fetchTodayNextEvent();
       if (nextEvent) {
+        window.nextEvent = nextEvent;
         console.log("📌 表示用予定タイトル:", nextEvent.summary);
         if (planBlock) planBlock.style.display = "flex";
         if (blankBlock) blankBlock.style.display = "none";
