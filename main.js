@@ -186,3 +186,13 @@ async function fetchTodayNextEvent() {
 }
 
 window.fetchTodayNextEvent = fetchTodayNextEvent;
+
+// ダークモード切り替えボタンの処理
+window.addEventListener('DOMContentLoaded', () => {
+  const darkmodeBtn = document.getElementById('floating-darkmode-btn');
+  if (darkmodeBtn) {
+    darkmodeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  }
+});

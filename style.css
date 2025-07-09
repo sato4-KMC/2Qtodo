@@ -16,6 +16,15 @@ body {
   align-items: center;
 }
 
+body.dark-mode {
+  --blue: #1976D2;
+  --white: #181A1B;
+  --gray: #444B54;
+  --accent: #FFB26B;
+  background-color: var(--blue);
+  color: #fff;
+}
+
 #recommend {
   width: 100vw;
   display: flex;
