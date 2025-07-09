@@ -96,6 +96,9 @@ function renderTasks(projectId = null) {
     const progressBarFill = card.querySelector('.progress-bar-fill');
     if (progressBarFill) progressBarFill.style.width = percent + '%';
 
+    renderTasks(projectId);
+    renderTasksList();
+
   } else {
     // 全プロジェクトを対象に描画
     const cards = document.querySelectorAll('.card');

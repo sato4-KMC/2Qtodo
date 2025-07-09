@@ -469,17 +469,20 @@ body {
   .top-block-logout {
     margin: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 6vw);
+    justify-content: center;
   }
   .top-block-blank {
     margin: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 6vw);
+    justify-content: center;
   }
   .top-block-plan {
     margin: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 6vw);
+    justify-content: center;
   }
   #recommend {
     width: 33vw;
