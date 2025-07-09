@@ -159,13 +159,21 @@ window.nextEvent = null;
 
 // nextEventまでに終わる未完了タスクを所要時間順で返す
 function sortTasks(tasks, nextEvent) {
-  if (!nextEvent) return tasks;
+  if (!nextEvent) {
+    // 完了・未完了で分けて、未完了→完了の順で昇順
+    const incompleted = tasks.filter(t => !t.completed).sort((a, b) => a.durationMin - b.durationMin);
+    const completed = tasks.filter(t => t.completed).sort((a, b) => a.durationMin - b.durationMin);
+    return [...incompleted, ...completed];
+  }
   const now = new Date();
   const start = new Date(nextEvent.start?.dateTime || nextEvent.start?.date);
   const remainMin = Math.floor((start - now) / 60000);
-  return tasks
-    .filter(t => !t.completed && t.durationMin <= remainMin)
-    .sort((a, b) => a.durationMin - b.durationMin);
+
+  // 未完了で今できるもの→未完了で今できないもの→完了、の順
+  const incompletedAvailable = tasks.filter(t => !t.completed && t.durationMin <= remainMin).sort((a, b) => a.durationMin - b.durationMin);
+  const incompletedUnavailable = tasks.filter(t => !t.completed && t.durationMin > remainMin).sort((a, b) => a.durationMin - b.durationMin);
+  const completed = tasks.filter(t => t.completed).sort((a, b) => a.durationMin - b.durationMin);
+  return [...incompletedAvailable, ...incompletedUnavailable, ...completed];
 }
 
 // タスク一覧セクションに全タスクを表示
