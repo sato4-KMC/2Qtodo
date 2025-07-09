@@ -66,10 +66,35 @@ function renderTasks(projectId = null) {
       taskDiv.innerHTML = `
         <div class="task-minute">${task.durationMin}</div>
         <div class="task-title">${task.title}</div>
-        <div class="task-checkbox"><input type="checkbox" /></div>
+        <div class="task-checkbox"><input type="checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}" /></div>
       `;
+      // チェックボックスのイベントリスナーを追加
+      const checkbox = taskDiv.querySelector('input[type="checkbox"]');
+      checkbox.addEventListener('change', function() {
+        const allTasks = loadDB("tasks", []);
+        const t = allTasks.find(t => t.id === task.id);
+        if (t) {
+          t.completed = this.checked;
+          saveDB("tasks", allTasks);
+        }
+      });
       container.insertBefore(taskDiv, container.querySelector('.task-add'));
     });
+
+    // 進捗バー更新処理を追加
+    const tasksForThisProject = list;
+    const total = tasksForThisProject.length;
+    const current = tasksForThisProject.filter(t => t.completed).length;
+    const percent = total === 0 ? 0 : Math.round((current / total) * 100);
+    const progressNumber = card.querySelector('.progress-number');
+    if (progressNumber) {
+      const currentSpan = progressNumber.querySelector('.current');
+      const totalSpan = progressNumber.querySelector('.total');
+      if (currentSpan) currentSpan.textContent = current;
+      if (totalSpan) totalSpan.textContent = `/${total}`;
+    }
+    const progressBarFill = card.querySelector('.progress-bar-fill');
+    if (progressBarFill) progressBarFill.style.width = percent + '%';
 
   } else {
     // 全プロジェクトを対象に描画
@@ -89,10 +114,33 @@ function renderTasks(projectId = null) {
         taskDiv.innerHTML = `
           <div class="task-minute">${task.durationMin}</div>
           <div class="task-title">${task.title}</div>
-          <div class="task-checkbox"><input type="checkbox" /></div>
+          <div class="task-checkbox"><input type="checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}" /></div>
         `;
+        // チェックボックスのイベントリスナーを追加
+        const checkbox = taskDiv.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+          const allTasks = loadDB("tasks", []);
+          const t = allTasks.find(t => t.id === task.id);
+          if (t) {
+            t.completed = this.checked;
+            saveDB("tasks", allTasks);
+          }
+        });
         container.insertBefore(taskDiv, container.querySelector('.task-add'));
       });
+      // 進捗バー更新処理を追加
+      const total = tasksForThisProject.length;
+      const current = tasksForThisProject.filter(t => t.completed).length;
+      const percent = total === 0 ? 0 : Math.round((current / total) * 100);
+      const progressNumber = card.querySelector('.progress-number');
+      if (progressNumber) {
+        const currentSpan = progressNumber.querySelector('.current');
+        const totalSpan = progressNumber.querySelector('.total');
+        if (currentSpan) currentSpan.textContent = current;
+        if (totalSpan) totalSpan.textContent = `/${total}`;
+      }
+      const progressBarFill = card.querySelector('.progress-bar-fill');
+      if (progressBarFill) progressBarFill.style.width = percent + '%';
     });
   }
 }
