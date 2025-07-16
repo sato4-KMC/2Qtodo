@@ -99,6 +99,7 @@ function renderTasks(projectId = null) {
     const percent = total === 0 ? 0 : Math.round((current / total) * 100);
     const progressNumber = card.querySelector('.progress-number');
     if (progressNumber) {
+      // i
       const currentSpan = progressNumber.querySelector('.current');
       const totalSpan = progressNumber.querySelector('.total');
       if (currentSpan) currentSpan.textContent = current;
