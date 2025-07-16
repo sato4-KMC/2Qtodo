@@ -1,12 +1,7 @@
 // データベース初期化 (projects と tasks を localStorage にセット)
 function loadDB(key, defaultValue) {
   const raw = localStorage.getItem(key);
-  try {
-    return raw ? JSON.parse(raw) : defaultValue;
-  } catch (e) {
-    console.error(`loadDB: ${key} のパースエラー`, e, raw);
-    return defaultValue; // エラー時は初期値を返す
-  }
+  return raw ? JSON.parse(raw) : defaultValue;
 }
 function saveDB(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
@@ -49,12 +44,13 @@ function addTask({ pjId, title, durationMin, level }) {
 // タスクを各プロジェクトの.task-container内に描画し、.task-addは残す
 function renderTasks(projectId = null) {
   console.log('renderTasks called with projectId:', projectId);
-  const allTasks = loadDB("tasks", []);
-  console.log('allTasks:', allTasks);
+  tasks = loadDB("tasks", []);
+  console.log('tasks:', tasks);
+
   // 必要ならプロジェクトIDでフィルタ
   const list = projectId
-    ? allTasks.filter(t => String(t.pjId) === String(projectId))
-    : allTasks;
+    ? tasks.filter(t => String(t.pjId) === String(projectId))
+    : tasks;
   console.log('filtered list:', list);
 
   if (projectId) {
@@ -129,7 +125,7 @@ function renderTasks(projectId = null) {
       // .task-add 以外を削除
       container.querySelectorAll('.task').forEach(e => e.remove());
 
-      const tasksForThisProject = allTasks.filter(t => String(t.pjId) === String(pjId));
+      const tasksForThisProject = tasks.filter(t => String(t.pjId) === String(pjId));
       // sortTasksで並べ替え
       const sortedTasks = sortTasks(tasksForThisProject, window.nextEvent);
       sortedTasks.forEach((task) => {
@@ -200,7 +196,8 @@ function sortTasks(tasks, nextEvent) {
 
 // タスク一覧セクションに全タスクを表示
 function renderTasksList() {
-  const allTasks = loadDB("tasks", []);
+  tasks = loadDB("tasks", []);
+
   const tasksContainer = document.querySelector('#tasks .card-list-container');
 
   if (!tasksContainer) return;
@@ -209,7 +206,7 @@ function renderTasksList() {
   tasksContainer.innerHTML = '';
 
   // nextEventまでに終わるタスクを所要時間順で表示
-  const sortedTasks = sortTasks(allTasks, window.nextEvent);
+  const sortedTasks = sortTasks(tasks, window.nextEvent);
   sortedTasks.forEach((task) => {
     const taskDiv = document.createElement("div");
     taskDiv.className = "task";
@@ -276,8 +273,8 @@ function renderProjects() {
 
 // タスク削除
 function deleteTask(taskId) {
-  const allTasks = loadDB("tasks", []);
-  const updatedTasks = allTasks.filter(task => task.id !== taskId);
+  tasks = loadDB("tasks", []);
+  const updatedTasks = tasks.filter(task => task.id !== taskId);
   saveDB("tasks", updatedTasks);
 
   // 表示を更新
@@ -550,11 +547,11 @@ function createNewCard(project) {
   newCard.querySelector('.task-container').addEventListener('change', function(e) {
     if (e.target && e.target.matches('input[type="checkbox"][data-task-id]')) {
       const taskId = e.target.getAttribute('data-task-id');
-      const allTasks = loadDB("tasks", []);
-      const t = allTasks.find(t => t.id === taskId);
+      tasks = loadDB("tasks", []);
+      const t = tasks.find(t => t.id === taskId);
       if (t) {
         t.completed = e.target.checked;
-        saveDB("tasks", allTasks);
+        saveDB("tasks", tasks);
         renderTasks(t.pjId);
         renderTasksList();
       }
@@ -590,11 +587,11 @@ document.addEventListener('DOMContentLoaded', () => {
     container.addEventListener('change', function(e) {
       if (e.target && e.target.matches('input[type="checkbox"][data-task-id]')) {
         const taskId = e.target.getAttribute('data-task-id');
-        const allTasks = loadDB("tasks", []);
-        const t = allTasks.find(t => t.id === taskId);
+        tasks = loadDB("tasks", []);
+        const t = tasks.find(t => t.id === taskId);
         if (t) {
           t.completed = e.target.checked;
-          saveDB("tasks", allTasks);
+          saveDB("tasks", tasks);
           renderTasks(t.pjId);
           renderTasksList();
         }
