@@ -10,7 +10,7 @@ function saveDB(key, data) {
 // projects: { id, name } の配列
 const projects = loadDB("projects", []);
 // tasks: { id, pjId, title, durationMin, level, createdAt, completed } の配列
-const tasks = loadDB("tasks", []);
+var tasks = loadDB("tasks", []);
 
 // プロジェクト追加
 function addProject(name) {
