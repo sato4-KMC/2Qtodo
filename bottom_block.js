@@ -271,11 +271,16 @@ function renderProjects() {
 // タスク削除
 function deleteTask(taskId) {
   tasks = loadDB("tasks", []);
+  // 削除するタスクのpjIdを取得
+  const deletedTask = tasks.find(task => task.id === taskId);
+  const pjId = deletedTask ? deletedTask.pjId : null;
   const updatedTasks = tasks.filter(task => task.id !== taskId);
   saveDB("tasks", updatedTasks);
 
   // 表示を更新
-  renderTasks();
+  if (pjId) {
+    renderTasks(pjId);
+  }
   renderTasksList();
 }
 
