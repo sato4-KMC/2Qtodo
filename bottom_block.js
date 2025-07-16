@@ -18,6 +18,7 @@ function addProject(name) {
     id: Date.now().toString(),
     name,
     createdAt: new Date().toISOString(),
+    color: generateRandomHueColor(),
   };
   projects.push(newProject);
   saveDB("projects", projects);
@@ -70,6 +71,15 @@ function renderTasks(projectId = null) {
         <div class="task-title">${task.title}</div>
         <div class="task-checkbox"><input type="checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}" /></div>
       `;
+      // Set background color and text color to parent project's color
+      const project = projects.find(p => p.id === task.pjId);
+      if (project) {
+        taskDiv.style.backgroundColor = project.color;
+        const minuteEl = taskDiv.querySelector('.task-minute');
+        if (minuteEl) minuteEl.style.color = project.color;
+        const titleEl = taskDiv.querySelector('.task-title');
+        if (titleEl) titleEl.style.color = project.color;
+      }
       // チェックボックスのイベントリスナーを追加
       const checkbox = taskDiv.querySelector('input[type="checkbox"]');
       checkbox.addEventListener('change', function() {
@@ -123,6 +133,15 @@ function renderTasks(projectId = null) {
           <div class="task-title">${task.title}</div>
           <div class="task-checkbox"><input type="checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}" /></div>
         `;
+        // Set background color and text color to parent project's color
+        const project = projects.find(p => p.id === task.pjId);
+        if (project) {
+          taskDiv.style.backgroundColor = project.color;
+          const minuteEl = taskDiv.querySelector('.task-minute');
+          if (minuteEl) minuteEl.style.color = project.color;
+          const titleEl = taskDiv.querySelector('.task-title');
+          if (titleEl) titleEl.style.color = project.color;
+        }
         // チェックボックスのイベントリスナーを追加
         const checkbox = taskDiv.querySelector('input[type="checkbox"]');
         checkbox.addEventListener('change', function() {
@@ -203,7 +222,15 @@ function renderTasksList() {
         </button>
       </div>
     `;
-    
+    // Set background and text color to parent project's color
+    const project = projects.find(p => p.id === task.pjId);
+    if (project) {
+      taskDiv.style.backgroundColor = project.color;
+      const minuteEl = taskDiv.querySelector('.task-minute');
+      if (minuteEl) minuteEl.style.color = project.color;
+      const titleEl = taskDiv.querySelector('.task-title');
+      if (titleEl) titleEl.style.color = project.color;
+    }
     // チェックボックスのイベントリスナーを追加
     const checkbox = taskDiv.querySelector('input[type="checkbox"]');
     checkbox.addEventListener('change', function() {
@@ -212,14 +239,12 @@ function renderTasksList() {
       renderTasks(task.pjId);
       renderTasksList();
     });
-    
     // 削除ボタンのイベントリスナーを追加
     const deleteBtn = taskDiv.querySelector('.delete-task-btn');
     deleteBtn.addEventListener('click', function() {
       const taskId = this.getAttribute('data-task-id');
       deleteTask(taskId);
     });
-    
     tasksContainer.appendChild(taskDiv);
   });
   
@@ -381,7 +406,6 @@ function setupProjectAddButtons() {
   projectAddButtons.forEach(button => {
     button.addEventListener('click', function(e) {
       e.stopPropagation();
-      handleProjectAdd(this);
     });
   });
   
@@ -451,11 +475,11 @@ function createNewCard(project) {
   newCard.setAttribute('data-pjid', project.id);
   
   newCard.innerHTML = `
-    <div class="card-title">${project.name}</div>
+    <div class="card-title" style="color: ${project.color};">${project.name}</div>
     <div class="task-container">
     </div>
     <div class="task-add">
-      <div class="task-minute">
+      <div class="task-minute" style="width: 65px;">
         <input type="number" placeholder="分数" maxlength="3" max="999" min="0" />
       </div>
       <div class="task-title">
@@ -463,15 +487,14 @@ function createNewCard(project) {
       </div>
       <div class="task-checkbox">
         <button class="task-add-button" data-pjid="${project.id}">
-          <span class="material-icons">
+          <span class="material-icons" style="color: ${project.color};">
             add
           </span>
         </button>
       </div>
     </div>
-    
     <div class="card-bottom-progress">
-      <div class="progress-number">
+      <div class="progress-number" style="color: ${project.color};">
         <span class="current">0</span><span class="total">/0</span>
       </div>
       <div class="progress-bar">
@@ -542,3 +565,35 @@ observer.observe(document.body, {
   childList: true,
   subtree: true
 });
+
+function generateRandomHueColor() {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 60; // % 
+  const lightness = 56;  // %
+  return hslToHex(hue, saturation, lightness);
+}
+
+// HSL -> HEX 変換
+function hslToHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+  let c = (1 - Math.abs(2 * l - 1)) * s;
+  let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  let m = l - c/2;
+  let r=0, g=0, b=0;
+  
+  if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+  else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+  else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+  else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+  else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+  else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  b = Math.round((b + m) * 255);
+
+  return "#" + [r,g,b].map(x =>
+    x.toString(16).padStart(2, '0')
+  ).join('');
+}

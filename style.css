@@ -250,7 +250,7 @@ body.dark-mode {
 
 .task-add {
   width: calc(100% - 20px);
-  height: 46px;
+  height: 92px;
   background-color: var(--blue);
   border-radius: 6px;
   padding: 0 10px;
@@ -407,6 +407,10 @@ body.dark-mode {
 .task-add-button span {
   font-size: 20px;
   color: black;
+}
+
+.task-minute input::placeholder {
+  font-size: 16px;
 }
 
 .task-checkbox input[type="checkbox"] {
