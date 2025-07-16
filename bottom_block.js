@@ -493,8 +493,8 @@ function createNewCard(project) {
     <div class="card-title" style="color: ${project.color};">${project.name}</div>
     <div class="task-container">
     </div>
-    <div class="task-add" style="display: flex; flex-direction: column;">
-      <div class="task-add-top" style="display: flex; flex-direction: row;">
+    <div class="task-add" style="display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; ">
+      <div class="task-add-top" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; ">
         <div class="task-minute" style="width: 65px;">
           <input type="number" placeholder="分数" maxlength="3" max="999" min="0" style="color: ${project.color};" />
         </div>
@@ -502,17 +502,17 @@ function createNewCard(project) {
           <input type="text" placeholder="タスク名を入力" style="color: ${project.color};" />
         </div>
       </div>
-      <div class="task-add-bottom" style="display: flex; flex-direction: row; margin-top: 4px;">
+      <div class="task-add-bottom" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; ">
         <div class="task-level">
-          <input type="range" placeholder="優先度" max="5" min="1" style="accent-color: ${project.color};" />
+          <input type="range" placeholder="優先度" max="5" min="1" style="accent-color: #ffffff;" />
         </div>
-      </div>
-      <div class="task-checkbox">
-        <button class="task-add-button" data-pjid="${project.id}">
-          <span class="material-icons" style="color: ${project.color};">
-            add
-          </span>
-        </button>
+        <div class="task-checkbox">
+          <button class="task-add-button" data-pjid="${project.id}">
+            <span class="material-icons" style="color: ${project.color};">
+              add
+            </span>
+          </button>
+        </div>
       </div>
     </div>
     <div class="card-bottom-progress">
