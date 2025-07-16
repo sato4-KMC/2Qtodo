@@ -43,19 +43,24 @@ function addTask({ pjId, title, durationMin, level }) {
 
 // タスクを各プロジェクトの.task-container内に描画し、.task-addは残す
 function renderTasks(projectId = null) {
+  console.log('renderTasks called with projectId:', projectId);
   const allTasks = loadDB("tasks", []);
+  console.log('allTasks:', allTasks);
 
   // 必要ならプロジェクトIDでフィルタ
   const list = projectId
     ? allTasks.filter(t => String(t.pjId) === String(projectId))
     : allTasks;
+  console.log('filtered list:', list);
 
   if (projectId) {
     // 特定のプロジェクトに対して描画
     const card = document.querySelector(`.card[data-pjid="${projectId}"]`);
+    console.log('card:', card);
     if (!card) return;
 
     const container = card.querySelector('.task-container');
+    console.log('container:', container);
     if (!container) return;
 
     // .task-add 以外を削除
@@ -291,10 +296,12 @@ function setupTaskAddButtons() {
   // 新しいイベントリスナーを追加
   const taskAddButtons = document.querySelectorAll('.task-add-button');
   taskAddButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.stopPropagation(); // イベントの伝播を停止
+    function handleTaskAddButtonClick(e) {
+      e.stopPropagation();
       handleTaskAdd(this);
-    });
+    }
+    button.removeEventListener('click', handleTaskAddButtonClick);
+    button.addEventListener('click', handleTaskAddButtonClick);
   });
 
   // Enterキーでのタスク追加も対応
