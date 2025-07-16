@@ -96,6 +96,14 @@ function renderTasks(projectId = null) {
       container.insertBefore(taskDiv, container.querySelector('.task-add'));
     });
 
+    // .task-addの色をプロジェクトカラーに設定
+    const project = projects.find(p => p.id === projectId);
+    const taskAdd = card.querySelector('.task-add');
+    if (taskAdd && project) {
+      taskAdd.style.backgroundColor = project.color;
+      taskAdd.style.color = project.color;
+    }
+
     // 進捗バー更新処理を追加
     const tasksForThisProject = list;
     const total = tasksForThisProject.length;
@@ -156,6 +164,13 @@ function renderTasks(projectId = null) {
         });
         container.insertBefore(taskDiv, container.querySelector('.task-add'));
       });
+      // .task-addの色をプロジェクトカラーに設定
+      const project = projects.find(p => p.id === pjId);
+      const taskAdd = card.querySelector('.task-add');
+      if (taskAdd && project) {
+        taskAdd.style.backgroundColor = project.color;
+        taskAdd.style.color = project.color;
+      }
       // 進捗バー更新処理を追加
       const total = tasksForThisProject.length;
       const current = tasksForThisProject.filter(t => t.completed).length;
@@ -478,12 +493,19 @@ function createNewCard(project) {
     <div class="card-title" style="color: ${project.color};">${project.name}</div>
     <div class="task-container">
     </div>
-    <div class="task-add">
-      <div class="task-minute" style="width: 65px;">
-        <input type="number" placeholder="分数" maxlength="3" max="999" min="0" />
+    <div class="task-add" style="display: flex; flex-direction: column;">
+      <div class="task-add-top" style="display: flex; flex-direction: row;">
+        <div class="task-minute" style="width: 65px;">
+          <input type="number" placeholder="分数" maxlength="3" max="999" min="0" style="color: ${project.color};" />
+        </div>
+        <div class="task-title">
+          <input type="text" placeholder="タスク名を入力" style="color: ${project.color};" />
+        </div>
       </div>
-      <div class="task-title">
-        <input type="text" placeholder="タスク名を入力" />
+      <div class="task-add-bottom" style="display: flex; flex-direction: row; margin-top: 4px;">
+        <div class="task-level">
+          <input type="range" placeholder="優先度" max="5" min="1" style="accent-color: ${project.color};" />
+        </div>
       </div>
       <div class="task-checkbox">
         <button class="task-add-button" data-pjid="${project.id}">
