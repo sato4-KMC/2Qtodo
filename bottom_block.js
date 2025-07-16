@@ -221,8 +221,6 @@ function renderTasksList() {
       taskDiv.style.backgroundColor = project.color;
       const minuteEl = taskDiv.querySelector('.task-minute');
       if (minuteEl) minuteEl.style.color = project.color;
-      const titleEl = taskDiv.querySelector('.task-title');
-      if (titleEl) titleEl.style.color = project.color;
     }
     // チェックボックスのイベントリスナーを追加
     // この部分を削除
@@ -475,7 +473,7 @@ function createNewCard(project) {
         </div>
       </div>
       <div class="task-add-bottom" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
-        <div class="task-level-label" style="font-size: 16px; color: ${project.color};">優先度 </div>
+        <div class="task-level-label" style="font-size: 16px; color:#fff; font-weight: bold; margin: 0;">優先度 </div>
         <div class="task-level">
           <input type="range" placeholder="優先度" max="5" min="1" style="accent-color: #ffffff;" />
         </div>
