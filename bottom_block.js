@@ -327,8 +327,10 @@ function handleTaskAdd(button) {
   const pjId = card.getAttribute('data-pjid');
   
   // 同じカード内の入力フィールドを取得
-  const minuteInput = card.querySelector('.task-add .task-add-top .task-minute input');
-  const titleInput = card.querySelector('.task-add .task-add-top .task-title input');
+  const taskAdd = button.closest('.task-add');
+  const minuteInput = taskAdd.querySelector('.task-add-top .task-minute input');
+  const titleInput = taskAdd.querySelector('.task-add-top .task-title input');
+  const levelInput = taskAdd.querySelector('.task-add-bottom .task-level input');
   
   // 入力値の取得
   const durationMin = minuteInput.value.trim();
