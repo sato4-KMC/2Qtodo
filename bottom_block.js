@@ -47,7 +47,7 @@ function renderTasks(projectId = null) {
 
   // 必要ならプロジェクトIDでフィルタ
   const list = projectId
-    ? allTasks.filter(t => t.pjId === projectId)
+    ? allTasks.filter(t => String(t.pjId) === String(projectId))
     : allTasks;
 
   if (projectId) {
@@ -72,7 +72,7 @@ function renderTasks(projectId = null) {
         <div class="task-checkbox"><input type="checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}" /></div>
       `;
       // Set background color and text color to parent project's color
-      const project = projects.find(p => p.id === task.pjId);
+      const project = projects.find(p => String(p.id) === String(task.pjId));
       if (project) {
         taskDiv.style.backgroundColor = project.color;
         const minuteEl = taskDiv.querySelector('.task-minute');
@@ -85,7 +85,7 @@ function renderTasks(projectId = null) {
     });
 
     // .task-addの色をプロジェクトカラーに設定
-    const project = projects.find(p => p.id === projectId);
+    const project = projects.find(p => String(p.id) === String(projectId));
     const taskAdd = card.querySelector('.task-add');
     if (taskAdd && project) {
       taskAdd.style.backgroundColor = project.color;
@@ -107,7 +107,7 @@ function renderTasks(projectId = null) {
     }
     const progressBarFill = card.querySelector('.progress-bar-fill');
     if (progressBarFill) progressBarFill.style.width = percent + '%';
-    
+
   } else {
     // 全プロジェクトを対象に描画
     const cards = document.querySelectorAll('.card');
@@ -119,7 +119,7 @@ function renderTasks(projectId = null) {
       // .task-add 以外を削除
       container.querySelectorAll('.task').forEach(e => e.remove());
 
-      const tasksForThisProject = allTasks.filter(t => t.pjId === pjId);
+      const tasksForThisProject = allTasks.filter(t => String(t.pjId) === String(pjId));
       // sortTasksで並べ替え
       const sortedTasks = sortTasks(tasksForThisProject, window.nextEvent);
       sortedTasks.forEach((task) => {
@@ -131,7 +131,7 @@ function renderTasks(projectId = null) {
           <div class="task-checkbox"><input type="checkbox" ${task.completed ? 'checked' : ''} data-task-id="${task.id}" /></div>
         `;
         // Set background color and text color to parent project's color
-        const project = projects.find(p => p.id === task.pjId);
+        const project = projects.find(p => String(p.id) === String(task.pjId));
         if (project) {
           taskDiv.style.backgroundColor = project.color;
           const minuteEl = taskDiv.querySelector('.task-minute');
@@ -143,7 +143,7 @@ function renderTasks(projectId = null) {
         // この部分を削除
       });
       // .task-addの色をプロジェクトカラーに設定
-      const project = projects.find(p => p.id === pjId);
+      const project = projects.find(p => String(p.id) === String(pjId));
       const taskAdd = card.querySelector('.task-add');
       if (taskAdd && project) {
         taskAdd.style.backgroundColor = project.color;
@@ -192,12 +192,12 @@ function sortTasks(tasks, nextEvent) {
 function renderTasksList() {
   const allTasks = loadDB("tasks", []);
   const tasksContainer = document.querySelector('#tasks .card-list-container');
-  
+
   if (!tasksContainer) return;
-  
+
   // 既存のタスクをクリア
   tasksContainer.innerHTML = '';
-  
+
   // nextEventまでに終わるタスクを所要時間順で表示
   const sortedTasks = sortTasks(allTasks, window.nextEvent);
   sortedTasks.forEach((task) => {
@@ -216,13 +216,12 @@ function renderTasksList() {
       </div>
     `;
     // Set background and text color to parent project's color
-    const project = projects.find(p => p.id === task.pjId);
+    const project = projects.find(p => String(p.id) === String(task.pjId));
     if (project) {
       taskDiv.style.backgroundColor = project.color;
       const minuteEl = taskDiv.querySelector('.task-minute');
       if (minuteEl) minuteEl.style.color = project.color;
     }
-    // チェックボックスのイベントリスナーを追加
     // この部分を削除
     // 削除ボタンのイベントリスナーを追加
     const deleteBtn = taskDiv.querySelector('.delete-task-btn');
@@ -232,7 +231,7 @@ function renderTasksList() {
     });
     tasksContainer.appendChild(taskDiv);
   });
-  
+
   // タスクが存在しない場合のメッセージ
   if (sortedTasks.length === 0) {
     const noTasksDiv = document.createElement("div");
@@ -250,7 +249,7 @@ function renderProjects() {
   const allProjects = loadDB("projects", []);
   const cardScrollContainer = document.querySelector('.card-scroll-container');
   if (!cardScrollContainer) return;
-  
+
   // 既存のカード（card-addとcard-sized-box以外）を削除
   const existingCards = cardScrollContainer.querySelectorAll('.card:not(.card-add)');
   existingCards.forEach(card => {
@@ -258,7 +257,7 @@ function renderProjects() {
       card.remove();
     }
   });
-  
+
   // 保存されたプロジェクトのカードを作成
   allProjects.forEach(project => {
     createNewCard(project);
@@ -270,7 +269,7 @@ function deleteTask(taskId) {
   const allTasks = loadDB("tasks", []);
   const updatedTasks = allTasks.filter(task => task.id !== taskId);
   saveDB("tasks", updatedTasks);
-  
+
   // 表示を更新
   renderTasks();
   renderTasksList();
@@ -283,12 +282,12 @@ function setupTaskAddButtons() {
   existingButtons.forEach(button => {
     button.removeEventListener('click', handleTaskAdd);
   });
-  
+
   const existingInputs = document.querySelectorAll('.task-add input');
   existingInputs.forEach(input => {
     input.removeEventListener('keypress', handleEnterKey);
   });
-  
+
   // 新しいイベントリスナーを追加
   const taskAddButtons = document.querySelectorAll('.task-add-button');
   taskAddButtons.forEach(button => {
@@ -297,7 +296,7 @@ function setupTaskAddButtons() {
       handleTaskAdd(this);
     });
   });
-  
+
   // Enterキーでのタスク追加も対応
   const taskInputs = document.querySelectorAll('.task-add input');
   taskInputs.forEach(input => {
@@ -325,24 +324,25 @@ function handleTaskAdd(button) {
   console.log('handleTaskAdd called'); // デバッグログ
   const card = button.closest('.card, .card-add');
   const pjId = card.getAttribute('data-pjid');
-  
+
   // 同じカード内の入力フィールドを取得
   const taskAdd = button.closest('.task-add');
   const minuteInput = taskAdd.querySelector('.task-add-top .task-minute input');
   const titleInput = taskAdd.querySelector('.task-add-top .task-title input');
   const levelInput = taskAdd.querySelector('.task-add-bottom .task-level input');
-  
+
   // 入力値の取得
   const durationMin = minuteInput.value.trim();
   const title = titleInput.value.trim();
-  
+  const level = levelInput.value.trim();
+
   // バリデーション
   if (!durationMin || !title) {
     alert('分数とタスク名を入力してください');
     isTaskSubmitting = false;
     return;
   }
-  
+
   if (isNaN(durationMin) || parseInt(durationMin) <= 0) {
     alert('有効な分数を入力してください');
     isTaskSubmitting = false;
@@ -355,21 +355,21 @@ function handleTaskAdd(button) {
     `pjId: ${pjId}\n` +
     `title: ${title}\n` +
     `durationMin: ${durationMin}\n` +
-    `level: 1`
+    `level: ${level}\n`
   );
-  
+
   // タスクを追加
   const newTask = addTask({
-    pjId: pjId,
+    pjId: String(pjId),
     title: title,
     durationMin: parseInt(durationMin),
-    level: 1
+    level: parseInt(level)
   });
-  
+
   // 入力フィールドをクリア
   minuteInput.value = '';
   titleInput.value = '';
-  
+
   // タスクを再描画
   renderTasks(pjId);
   // タスク一覧も更新
@@ -391,12 +391,12 @@ function setupProjectAddButtons() {
     button.removeEventListener('click', onProjectAddClick); // まず外す
     button.addEventListener('click', onProjectAddClick);    // そして付ける
   });
-  
+
   const existingProjectInputs = document.querySelectorAll('.card-add .input-underline');
   existingProjectInputs.forEach(input => {
     input.removeEventListener('keypress', handleProjectEnterKey);
   });
-  
+
   // 新しいイベントリスナーを追加
   const projectAddButtons = document.querySelectorAll('.pj-add-button');
   projectAddButtons.forEach(button => {
@@ -404,7 +404,7 @@ function setupProjectAddButtons() {
       e.stopPropagation();
     });
   });
-  
+
   // Enterキーでのプロジェクト追加も対応
   const projectNameInputs = document.querySelectorAll('.card-add .input-underline');
   projectNameInputs.forEach(input => {
@@ -432,27 +432,27 @@ function handleProjectAdd(button) {
   console.log('handleProjectAdd called'); // デバッグログ
   const cardAdd = button.closest('.card-add');
   if (!cardAdd) return;
-  
+
   // プロジェクト名の入力フィールドを取得
   const projectNameInput = cardAdd.querySelector('.input-underline');
   const projectName = projectNameInput.value.trim();
-  
+
   // バリデーション
   if (!projectName) {
     alert('プロジェクト名を入力してください');
     isSubmitting = false;
     return;
   }
-  
+
   // プロジェクトを追加
   const newProject = addProject(projectName);
-  
+
   // 入力フィールドをクリア
   projectNameInput.value = '';
-  
+
   // 新しいカードを作成して追加
   createNewCard(newProject);
-  
+
   // MutationObserverが自動的に新しいボタンにイベントリスナーを設定するため、
   // ここで手動で設定する必要はありません
   isSubmitting = false;
@@ -462,14 +462,14 @@ function handleProjectAdd(button) {
 function createNewCard(project) {
   const cardScrollContainer = document.querySelector('.card-scroll-container');
   if (!cardScrollContainer) return;
-  
+
   // card-sized-boxの前に新しいカードを挿入
   const cardSizedBox = cardScrollContainer.querySelector('.card-sized-box');
-  
+
   const newCard = document.createElement('div');
   newCard.className = 'card';
   newCard.setAttribute('data-pjid', project.id);
-  
+
   newCard.innerHTML = `
     <div class="card-title" style="color: ${project.color};">${project.name}</div>
     <div class="task-container">
@@ -506,10 +506,10 @@ function createNewCard(project) {
       </div>
     </div>
   `;
-  
+
   // card-sized-boxの前に挿入
   cardScrollContainer.insertBefore(newCard, cardSizedBox);
-  
+
   // 新しいカードをスクロール表示
   newCard.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
 
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTasksList(); // タスク一覧も表示
   setupTaskAddButtons();
   setupProjectAddButtons(); // プロジェクト追加ボタンも設定
-  
+
   // Scroll the first card into view on page load
   const initialCard = document.getElementById("initial-card");
   if (initialCard) {
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const observer = new MutationObserver(function(mutations) {
   let shouldReSetupTasks = false;
   let shouldReSetupProjects = false;
-  
+
   mutations.forEach(function(mutation) {
     if (mutation.type === 'childList') {
       // task-add-buttonが追加または削除された場合のみ再設定
@@ -596,7 +596,7 @@ const observer = new MutationObserver(function(mutations) {
       });
     }
   });
-  
+
   if (shouldReSetupTasks) {
     setupTaskAddButtons();
   }
@@ -613,7 +613,7 @@ observer.observe(document.body, {
 
 function generateRandomHueColor() {
   const hue = Math.floor(Math.random() * 360);
-  const saturation = 60; // % 
+  const saturation = 60; // %
   const lightness = 56;  // %
   return hslToHex(hue, saturation, lightness);
 }
@@ -626,7 +626,7 @@ function hslToHex(h, s, l) {
   let x = c * (1 - Math.abs((h / 60) % 2 - 1));
   let m = l - c/2;
   let r=0, g=0, b=0;
-  
+
   if (0 <= h && h < 60) { r = c; g = x; b = 0; }
   else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
   else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
