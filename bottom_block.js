@@ -346,6 +346,15 @@ function handleTaskAdd(button) {
     isTaskSubmitting = false;
     return;
   }
+
+  // addTaskに渡す値をすべて表示
+  alert(
+    `addTaskに渡す値:\n` +
+    `pjId: ${pjId}\n` +
+    `title: ${title}\n` +
+    `durationMin: ${durationMin}\n` +
+    `level: 1`
+  );
   
   // タスクを追加
   const newTask = addTask({
