@@ -1,7 +1,12 @@
 // データベース初期化 (projects と tasks を localStorage にセット)
 function loadDB(key, defaultValue) {
   const raw = localStorage.getItem(key);
-  return raw ? JSON.parse(raw) : defaultValue;
+  try {
+    return raw ? JSON.parse(raw) : defaultValue;
+  } catch (e) {
+    console.error(`loadDB: ${key} のパースエラー`, e, raw);
+    return defaultValue; // エラー時は初期値を返す
+  }
 }
 function saveDB(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
@@ -44,8 +49,12 @@ function addTask({ pjId, title, durationMin, level }) {
 // タスクを各プロジェクトの.task-container内に描画し、.task-addは残す
 function renderTasks(projectId = null) {
   console.log('renderTasks called with projectId:', projectId);
-  const allTasks = loadDB("tasks", []);
-  console.log('allTasks:', allTasks);
+  try {
+    const allTasks = loadDB("tasks", []);
+    console.log('allTasks:', allTasks);
+  } catch (e) {
+    console.error('tasksの取得・パースでエラー:', e);
+  }
 
   // 必要ならプロジェクトIDでフィルタ
   const list = projectId
@@ -87,6 +96,7 @@ function renderTasks(projectId = null) {
       }
       // チェックボックスのイベントリスナーを追加
       // この部分を削除
+      container.appendChild(taskDiv);
     });
 
     // .task-addの色をプロジェクトカラーに設定
