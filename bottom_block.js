@@ -466,7 +466,7 @@ function createNewCard(project) {
     <div class="task-container">
     </div>
     <div class="task-add" style="display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; background-color: ${project.color};">
-      <div class="task-add-top" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; ">
+      <div class="task-add-top" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
         <div class="task-minute" style="width: 65px;">
           <input type="number" placeholder="分数" maxlength="3" max="999" min="1" style="color: ${project.color};" />
         </div>
@@ -474,7 +474,8 @@ function createNewCard(project) {
           <input type="text" placeholder="タスク名を入力" />
         </div>
       </div>
-      <div class="task-add-bottom" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; ">
+      <div class="task-add-bottom" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
+        <div class="task-level-label" style="font-size: 16px; color: ${project.color};">優先度 </div>
         <div class="task-level">
           <input type="range" placeholder="優先度" max="5" min="1" style="accent-color: #ffffff;" />
         </div>
