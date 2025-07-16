@@ -473,9 +473,9 @@ function createNewCard(project) {
         </div>
       </div>
       <div class="task-add-bottom" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
-        <div class="task-level-label" style="font-size: 16px; color:#fff; font-weight: bold; margin: 0;">優先度 </div>
         <div class="task-level">
-          <input type="range" placeholder="優先度" max="5" min="1" style="accent-color: #ffffff;" />
+          <input type="range" max="5" min="1" value="3" style="accent-color: #ffffff;" class="priority-range" />
+          <span class="priority-value" style="margin-left: 8px; color: #fff; font-weight: bold;">優先度: 3</span>
         </div>
         <div class="task-checkbox">
           <button class="task-add-button" data-pjid="${project.id}">
@@ -516,6 +516,15 @@ function createNewCard(project) {
       }
     }
   });
+
+  // 優先度スライダーの値をリアルタイム表示
+  const priorityRange = newCard.querySelector('.priority-range');
+  const priorityValue = newCard.querySelector('.priority-value');
+  if (priorityRange && priorityValue) {
+    priorityRange.addEventListener('input', function() {
+      priorityValue.textContent = `優先度: ${this.value}`;
+    });
+  }
 }
 
 // DOMContentLoadedイベントでボタン設定を実行
