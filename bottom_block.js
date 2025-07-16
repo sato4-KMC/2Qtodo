@@ -282,28 +282,13 @@ function deleteTask(taskId) {
 // タスク追加ボタンのイベントリスナーを設定
 function setupTaskAddButtons() {
   // 既存のイベントリスナーを削除（重複を防ぐため）
-  const existingButtons = document.querySelectorAll('.task-add-button');
-  existingButtons.forEach(button => {
-    button.removeEventListener('click', handleTaskAdd);
-  });
-
-  const existingInputs = document.querySelectorAll('.task-add input');
-  existingInputs.forEach(input => {
-    input.removeEventListener('keypress', handleEnterKey);
-  });
-
-  // 新しいイベントリスナーを追加
   const taskAddButtons = document.querySelectorAll('.task-add-button');
   taskAddButtons.forEach(button => {
-    function handleTaskAddButtonClick(e) {
-      e.stopPropagation();
-      handleTaskAdd(this);
-    }
     button.removeEventListener('click', handleTaskAddButtonClick);
     button.addEventListener('click', handleTaskAddButtonClick);
   });
 
-  // Enterキーでのタスク追加も対応
+  // Enterキーでのタスク追加も同様に修正
   const taskInputs = document.querySelectorAll('.task-add input');
   taskInputs.forEach(input => {
     input.addEventListener('keypress', handleEnterKey);
@@ -360,13 +345,6 @@ function handleTaskAdd(button) {
     return;
   }
 
-  if (isNaN(durationMin) || parseInt(durationMin) <= 0) {
-    console.log('バリデーション失敗: 分数が不正', durationMin);
-    alert('有効な分数を入力してください');
-    isTaskSubmitting = false;
-    return;
-  }
-
   // addTaskに渡す値をすべて表示
   console.log('addTaskに渡す値:', {
     pjId: pjId,
@@ -374,13 +352,6 @@ function handleTaskAdd(button) {
     durationMin: durationMin,
     level: level
   });
-  alert(
-    `addTaskに渡す値:\n` +
-    `pjId: ${pjId}\n` +
-    `title: ${title}\n` +
-    `durationMin: ${durationMin}\n` +
-    `level: ${level}\n`
-  );
 
   // タスクを追加
   const newTask = addTask({
@@ -402,6 +373,12 @@ function handleTaskAdd(button) {
   renderTasksList();
   isTaskSubmitting = false;
   console.log('handleTaskAdd 完了');
+}
+
+// グローバルスコープで一度だけ定義
+function handleTaskAddButtonClick(e) {
+  e.stopPropagation();
+  handleTaskAdd(this);
 }
 
 // プロジェクト追加ボタンのイベントリスナーを設定
