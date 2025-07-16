@@ -81,19 +81,7 @@ function renderTasks(projectId = null) {
         if (titleEl) titleEl.style.color = project.color;
       }
       // チェックボックスのイベントリスナーを追加
-      const checkbox = taskDiv.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener('change', function() {
-        const allTasks = loadDB("tasks", []);
-        const t = allTasks.find(t => t.id === task.id);
-        if (t) {
-          t.completed = this.checked;
-          saveDB("tasks", allTasks);
-          // ここで画面再描画を呼ぶのが正解！
-          renderTasks(task.pjId); // ← プロジェクトごとのタスク再描画
-          renderTasksList();      // ← タスク一覧再描画
-        }
-      });
-      container.insertBefore(taskDiv, container.querySelector('.task-add'));
+      // この部分を削除
     });
 
     // .task-addの色をプロジェクトカラーに設定
@@ -151,18 +139,7 @@ function renderTasks(projectId = null) {
           if (titleEl) titleEl.style.color = project.color;
         }
         // チェックボックスのイベントリスナーを追加
-        const checkbox = taskDiv.querySelector('input[type="checkbox"]');
-        checkbox.addEventListener('change', function() {
-          const allTasks = loadDB("tasks", []);
-          const t = allTasks.find(t => t.id === task.id);
-          if (t) {
-            t.completed = this.checked;
-            saveDB("tasks", allTasks);
-            renderTasks(task.pjId);
-            renderTasksList();
-          }
-        });
-        container.insertBefore(taskDiv, container.querySelector('.task-add'));
+        // この部分を削除
       });
       // .task-addの色をプロジェクトカラーに設定
       const project = projects.find(p => p.id === pjId);
@@ -247,13 +224,7 @@ function renderTasksList() {
       if (titleEl) titleEl.style.color = project.color;
     }
     // チェックボックスのイベントリスナーを追加
-    const checkbox = taskDiv.querySelector('input[type="checkbox"]');
-    checkbox.addEventListener('change', function() {
-      task.completed = this.checked;
-      saveDB("tasks", allTasks);
-      renderTasks(task.pjId);
-      renderTasksList();
-    });
+    // この部分を削除
     // 削除ボタンのイベントリスナーを追加
     const deleteBtn = taskDiv.querySelector('.delete-task-btn');
     deleteBtn.addEventListener('click', function() {
@@ -530,6 +501,21 @@ function createNewCard(project) {
   
   // 新しいカードをスクロール表示
   newCard.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+
+  // イベントデリゲーションを設定
+  newCard.querySelector('.task-container').addEventListener('change', function(e) {
+    if (e.target && e.target.matches('input[type="checkbox"][data-task-id]')) {
+      const taskId = e.target.getAttribute('data-task-id');
+      const allTasks = loadDB("tasks", []);
+      const t = allTasks.find(t => t.id === taskId);
+      if (t) {
+        t.completed = e.target.checked;
+        saveDB("tasks", allTasks);
+        renderTasks(t.pjId);
+        renderTasksList();
+      }
+    }
+  });
 }
 
 // DOMContentLoadedイベントでボタン設定を実行
@@ -545,6 +531,23 @@ document.addEventListener('DOMContentLoaded', () => {
   if (initialCard) {
     initialCard.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }
+
+  // 既存のタスクコンテナにイベントデリゲーションを設定
+  document.querySelectorAll('.task-container').forEach(container => {
+    container.addEventListener('change', function(e) {
+      if (e.target && e.target.matches('input[type="checkbox"][data-task-id]')) {
+        const taskId = e.target.getAttribute('data-task-id');
+        const allTasks = loadDB("tasks", []);
+        const t = allTasks.find(t => t.id === taskId);
+        if (t) {
+          t.completed = e.target.checked;
+          saveDB("tasks", allTasks);
+          renderTasks(t.pjId);
+          renderTasksList();
+        }
+      }
+    });
+  });
 });
 
 // 動的に追加される要素にも対応するため、MutationObserverを使用
