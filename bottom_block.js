@@ -82,8 +82,6 @@ function renderTasks(projectId = null) {
         taskDiv.style.backgroundColor = project.color;
         const minuteEl = taskDiv.querySelector('.task-minute');
         if (minuteEl) minuteEl.style.color = project.color;
-        const titleEl = taskDiv.querySelector('.task-title');
-        if (titleEl) titleEl.style.color = project.color;
       }
       // チェックボックスのイベントリスナーを追加
       // この部分を削除
@@ -142,8 +140,6 @@ function renderTasks(projectId = null) {
           taskDiv.style.backgroundColor = project.color;
           const minuteEl = taskDiv.querySelector('.task-minute');
           if (minuteEl) minuteEl.style.color = project.color;
-          const titleEl = taskDiv.querySelector('.task-title');
-          if (titleEl) titleEl.style.color = project.color;
         }
         // チェックボックスのイベントリスナーを追加
         // この部分を削除
