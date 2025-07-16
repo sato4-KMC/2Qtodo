@@ -183,11 +183,27 @@ function sortTasks(tasks, nextEvent) {
   const start = new Date(nextEvent.start?.dateTime || nextEvent.start?.date);
   const remainMin = Math.floor((start - now) / 60000);
 
-  // 未完了で今できるもの→未完了で今できないもの→完了、の順
-  const incompletedAvailable = tasks.filter(t => !t.completed && t.durationMin <= remainMin).sort((a, b) => a.durationMin - b.durationMin);
-  const incompletedUnavailable = tasks.filter(t => !t.completed && t.durationMin > remainMin).sort((a, b) => a.durationMin - b.durationMin);
-  const completed = tasks.filter(t => t.completed).sort((a, b) => a.durationMin - b.durationMin);
-  return [...incompletedAvailable, ...incompletedUnavailable, ...completed];
+  // 未完了タスクのみ対象
+  const incompleted = tasks.filter(t => !t.completed);
+  // 残り時間以内に終わるタスク
+  const available = incompleted.filter(t => t.durationMin <= remainMin);
+  // 残り時間を超えるタスク
+  const unavailable = incompleted.filter(t => t.durationMin > remainMin);
+  // 完了タスク
+  const completed = tasks.filter(t => t.completed);
+
+  // availableを優先度（level:降順）→durationMin（昇順）でソート
+  available.sort((a, b) => {
+    if (b.level !== a.level) return b.level - a.level; // 優先度高い順
+    return a.durationMin - b.durationMin; // 同じ優先度なら短い順
+  });
+
+  // unavailableはdurationMin昇順
+  unavailable.sort((a, b) => a.durationMin - b.durationMin);
+  // completedはdurationMin昇順
+  completed.sort((a, b) => a.durationMin - b.durationMin);
+
+  return [...available, ...unavailable, ...completed];
 }
 
 // タスク一覧セクションに全タスクを表示
