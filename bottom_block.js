@@ -49,13 +49,8 @@ function addTask({ pjId, title, durationMin, level }) {
 // タスクを各プロジェクトの.task-container内に描画し、.task-addは残す
 function renderTasks(projectId = null) {
   console.log('renderTasks called with projectId:', projectId);
-  try {
-    const allTasks = loadDB("tasks", []);
-    console.log('allTasks:', allTasks);
-  } catch (e) {
-    console.error('tasksの取得・パースでエラー:', e);
-  }
-
+  const allTasks = loadDB("tasks", []);
+  console.log('allTasks:', allTasks);
   // 必要ならプロジェクトIDでフィルタ
   const list = projectId
     ? allTasks.filter(t => String(t.pjId) === String(projectId))
