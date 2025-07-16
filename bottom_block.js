@@ -261,9 +261,10 @@ function renderProjects() {
     }
   });
 
-  // 保存されたプロジェクトのカードを作成
+  // 保存されたプロジェクトのカードを作成し、タスクも描画
   allProjects.forEach(project => {
     createNewCard(project);
+    renderTasks(project.id); // ← ここで各プロジェクトのタスクを描画
   });
 }
 
@@ -566,11 +567,10 @@ function createNewCard(project) {
 
 // DOMContentLoadedイベントでボタン設定を実行
 document.addEventListener('DOMContentLoaded', () => {
-  renderProjects(); // 保存されたプロジェクトを表示
-  renderTasks();
-  renderTasksList(); // タスク一覧も表示
+  renderProjects();
+  renderTasksList();
   setupTaskAddButtons();
-  setupProjectAddButtons(); // プロジェクト追加ボタンも設定
+  setupProjectAddButtons();
 
   // Scroll the first card into view on page load
   const initialCard = document.getElementById("initial-card");
