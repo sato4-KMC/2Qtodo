@@ -319,37 +319,55 @@ let isTaskSubmitting = false; // タスク追加用の2度押し防止フラグ
 
 // タスク追加の共通処理
 function handleTaskAdd(button) {
-  if (isTaskSubmitting) return; // 2度押し防止
+  if (isTaskSubmitting) {
+    console.log('handleTaskAdd: isTaskSubmitting=true, return');
+    return; // 2度押し防止
+  }
   isTaskSubmitting = true;
   console.log('handleTaskAdd called'); // デバッグログ
   const card = button.closest('.card, .card-add');
-  const pjId = card.getAttribute('data-pjid');
+  console.log('card:', card);
+  const pjId = card ? card.getAttribute('data-pjid') : null;
+  console.log('pjId:', pjId);
 
   // 同じカード内の入力フィールドを取得
   const taskAdd = button.closest('.task-add');
-  const minuteInput = taskAdd.querySelector('.task-add-top .task-minute input');
-  const titleInput = taskAdd.querySelector('.task-add-top .task-title input');
-  const levelInput = taskAdd.querySelector('.task-add-bottom .task-level input');
+  console.log('taskAdd:', taskAdd);
+  const minuteInput = taskAdd ? taskAdd.querySelector('.task-add-top .task-minute input') : null;
+  const titleInput = taskAdd ? taskAdd.querySelector('.task-add-top .task-title input') : null;
+  const levelInput = taskAdd ? taskAdd.querySelector('.task-add-bottom .task-level input') : null;
+  console.log('minuteInput:', minuteInput, 'value:', minuteInput && minuteInput.value);
+  console.log('titleInput:', titleInput, 'value:', titleInput && titleInput.value);
+  console.log('levelInput:', levelInput, 'value:', levelInput && levelInput.value);
 
   // 入力値の取得
-  const durationMin = minuteInput.value.trim();
-  const title = titleInput.value.trim();
-  const level = levelInput.value.trim();
+  const durationMin = minuteInput ? minuteInput.value.trim() : '';
+  const title = titleInput ? titleInput.value.trim() : '';
+  const level = levelInput ? levelInput.value.trim() : '';
+  console.log('durationMin:', durationMin, 'title:', title, 'level:', level);
 
   // バリデーション
   if (!durationMin || !title) {
+    console.log('バリデーション失敗: 分数またはタスク名が空');
     alert('分数とタスク名を入力してください');
     isTaskSubmitting = false;
     return;
   }
 
   if (isNaN(durationMin) || parseInt(durationMin) <= 0) {
+    console.log('バリデーション失敗: 分数が不正', durationMin);
     alert('有効な分数を入力してください');
     isTaskSubmitting = false;
     return;
   }
 
   // addTaskに渡す値をすべて表示
+  console.log('addTaskに渡す値:', {
+    pjId: pjId,
+    title: title,
+    durationMin: durationMin,
+    level: level
+  });
   alert(
     `addTaskに渡す値:\n` +
     `pjId: ${pjId}\n` +
@@ -365,16 +383,19 @@ function handleTaskAdd(button) {
     durationMin: parseInt(durationMin),
     level: parseInt(level)
   });
+  console.log('addTaskで追加されたnewTask:', newTask);
 
   // 入力フィールドをクリア
-  minuteInput.value = '';
-  titleInput.value = '';
+  if (minuteInput) minuteInput.value = '';
+  if (titleInput) titleInput.value = '';
 
   // タスクを再描画
+  console.log('renderTasksを呼び出します', pjId);
   renderTasks(pjId);
-  // タスク一覧も更新
+  console.log('renderTasksListを呼び出します');
   renderTasksList();
   isTaskSubmitting = false;
+  console.log('handleTaskAdd 完了');
 }
 
 // プロジェクト追加ボタンのイベントリスナーを設定
